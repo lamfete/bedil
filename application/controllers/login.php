@@ -26,22 +26,31 @@ class Login extends CI_Controller {
         $this->form_validation->set_error_delimiters('<span class="error">', '</span>');
         
         if($this->form_validation->run()==FALSE) {
-            $this->load->view('view_login');
+            $data['wrong_username_pass'] = 0;
+            $this->load->view('view_login', $data);
         } else {
             $username = $this->input->post('username');
             $password = $this->input->post('password');
-            $cek = $this->m_login->get_name($username, $password, 1);
+
+            // check user level
+            $user_level = $this->m_login->get_user_level($username, $password);
+            $data['user_level'] = $user_level;
+            $cek = $this->m_login->get_name($username, $password, $user_level);
             if($cek <> 0) {
                 $this->session->set_userdata('isLogin', TRUE);
                 $this->session->set_userdata('username',$username);
+                $this->session->set_userdata('userlevel',$user_level);
                 redirect('home');
             } else {
+                
                 ?>
                 <script>
-                alert('Failed Login: Check your username and password!');
-                history.go(-1);
+                // alert('Failed Login: Check your username and password!');
+                // history.go(-1);
                 </script>
                 <?php
+                $data['wrong_username_pass'] = 1;
+                $this->load->view('view_login', $data);
             }
         }  
     }

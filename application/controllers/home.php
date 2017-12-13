@@ -10,10 +10,12 @@ class Home extends CI_Controller {
     
     public function index() {
         if($this->session->userdata('isLogin') == FALSE) {
-
+            
             redirect('login/form');
         } else {
-            $this->load->view('view_home');
+            $data['userlevel'] = $this->session->userdata('userlevel');
+            // echo $data['userlevel']->user_level_id;
+            $this->load->view('view_home', $data);
         }
     } 
 }
