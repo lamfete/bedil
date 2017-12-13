@@ -38,8 +38,8 @@ class Login extends CI_Controller {
             $cek = $this->m_login->get_name($username, $password, $user_level);
             if($cek <> 0) {
                 $this->session->set_userdata('isLogin', TRUE);
-                $this->session->set_userdata('username',$username);
-                $this->session->set_userdata('userlevel',$user_level);
+                $this->session->set_userdata('username', $username);
+                $this->session->set_userdata('userlevel', $user_level);
                 redirect('home');
             } else {
                 
