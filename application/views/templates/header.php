@@ -11,7 +11,8 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
     <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/DataTables/DataTables-1.10.16/css/jquery.datatables.css"/>
+    <!-- <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css"> -->
 
     <!-- Custom styles for this template -->
     <link href="assets/style/theme.css" rel="stylesheet">
@@ -31,11 +32,11 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Bedil</a>
+                <a class="navbar-brand" href="#">RONDA</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                <li class="active"><a href="<?php echo "/login/home"; ?>">Home</a></li>
+                <li class="active"><a href="<?php echo "/home"; ?>">Home</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Master <span class="caret"></span></a>
                     <ul class="dropdown-menu">

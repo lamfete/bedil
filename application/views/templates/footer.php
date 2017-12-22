@@ -18,7 +18,24 @@
 
 <!-- DataTables JavaScript
 ================================================== -->
-<script type="text/javascript" src="assets/DataTables/datatables.min.js"></script>
+<script type="text/javascript" src="assets/DataTables/DataTables-1.10.16/js/jquery.dataTables.js"></script>
+<!-- <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script> -->
+
+<script>
+$(document).ready(function() {
+    
+    $('#table_user').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "paging": true,
+        "searching": true,
+        "ajax": {
+            url: '<?php echo base_url('userexec/get_user'); ?>',
+            type: 'POST'
+        }
+    });
+} );
+</script>
 
 </body>
 </html>
