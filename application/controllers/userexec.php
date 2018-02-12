@@ -20,11 +20,11 @@ class Userexec extends CI_Controller {
             $data['userlevel'] = $this->session->userdata('userlevel');
             $data['name'] = $this->m_login->get_name($this->session->userdata('username'));
             if(empty($_POST['search']['value'])) {
-                $data['all_user'] = $this->m_user->get_all_user();    
+                $data['all_user'] = $this->m_user->get_all_user_("all", "");    
                 $data['all_user']->draw = $_POST['draw'];
             }
             else {
-                $data['all_user'] = $this->m_user->get_all_user_search($_POST['search']['value']);
+                $data['all_user'] = $this->m_user->get_all_user_("search", $_POST['search']['value']);
                 $data['all_user']->draw = $_POST['draw'];
             }
             
