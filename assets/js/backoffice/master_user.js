@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    
     $('#table_user').DataTable({
         "processing": true,
         "serverSide": true,

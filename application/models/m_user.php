@@ -38,7 +38,7 @@ class M_user extends CI_Model {
                 array_push($col_arr, $value);
             }
             $implode = json_encode($col_arr);
-            array_push($col_arr, "<a class='btn btn-default' role='button' data-toggle='modal' data-target='#myModal' onclick='editUser(".$implode.")'>Edit</a>");
+            array_push($col_arr, "<a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editUser(".$implode.")'>Edit</a>");
             
             array_push($result_arr, $col_arr);
             unset($col_arr);
