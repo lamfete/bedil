@@ -4,28 +4,42 @@
 
 <title>Administration</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <!-- Bootstrap core CSS -->
-    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap theme -->
-    <link href="assets/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="assets/DataTables/DataTables-1.10.16/css/jquery.dataTables.css"/>
     <link rel="stylesheet" type="text/css" href="assets/DataTables/DataTables-1.10.16/css/dataTables.bootstrap.css"/>
-    <link rel="stylesheet" type="text/css" href="assets/DataTables/Responsive-2.2.1/css/responsive.bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/DataTables/Responsive-2.2.1/css/responsive.bootstrap.min.css"/>
 
     <!-- Custom styles for this template -->
     <link href="assets/style/theme.css" rel="stylesheet">
 
+    <!--<link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/DataTables/DataTables-1.10.16/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/DataTables/Responsive-2.2.1/css/responsive.bootstrap.min.css">-->
+
     <!-- jQuery -->
     <script src="<?php echo base_url(); ?>assets/js/jquery/jquery-3.3.1.js"></script>
 
-    <!-- DataTables jQuery -->
-    <link rel="stylesheet" type="text/css" href="assets/DataTables/DataTables-1.10.16/js/jquery.dataTables.js"/>
-    <link rel="stylesheet" type="text/css" href="assets/DataTables/Responsive-2.2.1/js/dataTables.responsive.js"/>
-    <link rel="stylesheet" type="text/css" href="assets/DataTables/DataTables-1.10.16/js/dataTables.bootstrap.js"/>
-    
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>-->
+    <!--<link rel="stylesheet" href="http://cdn.datatables.net/plug-ins/a5734b29083/integration/bootstrap/3/dataTables.bootstrap.css"/> -->
+    <!--<link rel="stylesheet" href="http://cdn.datatables.net/responsive/1.0.2/css/dataTables.responsive.css"/>-->
+    <style>
+        /*body {
+            font-size: 140%;
+        }*/
+
+        table.dataTable th,
+        table.dataTable td {
+            white-space: nowrap;
+        }
+    </style>
+
 </head>
 <body>
 

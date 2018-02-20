@@ -1,8 +1,9 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/backoffice/master_user.js"></script>
 
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-xs-12">
         <?php
+            error_reporting(E_ALL & ~E_NOTICE);
             echo "Hello, user " . $name->name . ".<br />";
         ?>
         <!-- Button trigger modal -->
@@ -20,44 +21,45 @@
 </div>
 
 <div class="row" style="margin-bottom:10px;">
-    <div class="col-md-12">
+    <div class="col-xs-12">
         
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <table id="table_user" class="table table-striped table-hover dt-responsive" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th>ID user</th>
-                    <th>user_level_id</th>
-                    <th>User Login</th>
-                    <th>Name</th>
-                    <th>Password</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
-                    <th>Level user</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <!--<tfoot>
+    <div class="col-xs-12">
+            <table id="table_user" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
+                <thead>
                     <tr>
-                    <th>ID user</th>
-                    <th>user_level_id</th>
-                    <th>User Login</th>
-                    <th>Name</th>
-                    <th>Password</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Updated At</th>
-                    <th>Level user</th>
-                    <th>Action</th>
-                </tr>
-            </tfoot>-->
-        </table>
-    </div>
+                        <th></th>
+                        <th>ID user</th>
+                        <!-- <th>user_level_id</th> -->
+                        <th>User Login</th>
+                        <th>Name</th>
+                        <!-- <th>Password</th> -->
+                        <th>Status</th>
+                        <!-- <th>Created At</th> -->
+                        <!-- <th>Updated At</th> -->
+                        <th>Level user</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <!--<tfoot>
+                        <tr>
+                        <th>ID user</th>
+                        <th>user_level_id</th>
+                        <th>User Login</th>
+                        <th>Name</th>
+                        <th>Password</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                        <th>Level user</th>
+                        <th>Action</th>
+                    </tr>
+                </tfoot>-->
+            </table>
+        </div>
 </div>
 
 <!-- Edit Modal -->
@@ -109,12 +111,21 @@
                 <!-- <input type="text" id="username" class="form-control"> -->
                 <form>
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Username</label>
-                        <input type="text" class="form-control" id="user_login" placeholder="Username" disabled>
+                        <label for="lblUsername">Username</label>
+                        <input type="text" class="form-control" id="txtUsername" placeholder="Username">
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Name</label>
-                        <input type="text" class="form-control" id="name" placeholder="Name">
+                        <label for="lblName">Name</label>
+                        <input type="text" class="form-control" id="txtName" placeholder="Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lblPassword">Password</label>
+                        <input type="text" class="form-control" id="txtPassword" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label for="lblUserLevel">User Level</label>
+                        <select class="form-control" id="userLevel" name="userLevel">
+                        </select>
                     </div>
                     <div class="checkbox">
                         <label>

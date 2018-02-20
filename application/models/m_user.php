@@ -7,12 +7,13 @@ class M_user extends CI_Model {
         parent::__construct();
     }
 
-    public function get_all_user_($type, $input) {
+    public function get_all_user($type, $input) {
         $result = new stdClass();
         
         $result_arr = array();
 
         if($type=="all") {
+            // $this->db->select('user.user_id as user_id, user.user_login as username, user.name as name, user.password as password, user.status as status, user_level.user_level_name as user_level');
             $this->db->select('*');
             $this->db->from('user');
             $this->db->join('user_level', 'user.user_level_id = user_level.user_level_id', 'left');
@@ -44,11 +45,11 @@ class M_user extends CI_Model {
             unset($col_arr);
         }
         $result->data = $result_arr;
-        // var_dump($result);
+        // var_dump($result);exit;
         return $result;
     }
 
-    public function get_all_user($type, $input) {
+    public function get_all_user_($type, $input) {
         $sql="";
         // $result = 0;
         $result = new stdClass();
@@ -98,6 +99,44 @@ class M_user extends CI_Model {
         $result->data = $result_arr;
 
         return $result;
+    }
+
+    public function get_user_level(){
+        $result = new stdClass();
+        
+        $result_arr = array();
+
+        $this->db->select('user_level_id, user_level_name');
+        $this->db->from('user_level');
+
+        $query = $this->db->get();
+        $num_rows = $query->num_rows();
+
+        $result->draw = 1;
+        $result->recordsTotal = $num_rows;
+        $result->recordsFiltered = $num_rows;
+        
+        for($i=0; $i<$result->recordsTotal; $i++) {
+            $col_arr = array();
+            
+            foreach($query->result_array()[$i] as $key => $value) {
+                array_push($col_arr, $value);
+            }
+            $implode = json_encode($col_arr);
+            // array_push($col_arr, "<a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editUser(".$implode.")'>Edit</a>");
+            
+            array_push($result_arr, $col_arr);
+            unset($col_arr);
+        }
+        $result->data = $query->result_array();
+        /*
+         *  =====================
+         *  Hasilnya seperti ini:
+         *  array(4) { ["user_level_id"]=> string(1) "1" ["user_level_name"]=> string(19) "SUPER ADMINISTRATOR" ["created_at"]=> string(19) "2017-12-12 15:10:36" ["updated_at"]=> NULL } 
+         *  =====================
+         */
+        // var_dump($result);exit;
+        return $result->data;
     }
 }
 ?>

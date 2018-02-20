@@ -13,24 +13,33 @@ class Userexec extends CI_Controller {
     
     public function get_user() {
         if($this->session->userdata('isLogin') == FALSE) {
-            
             redirect('login/form');
         } else {
             
             $data['userlevel'] = $this->session->userdata('userlevel');
             $data['name'] = $this->m_login->get_name($this->session->userdata('username'));
             if(empty($_POST['search']['value'])) {
-                $data['all_user'] = $this->m_user->get_all_user_("all", "");    
+                $data['all_user'] = $this->m_user->get_all_user("all", "");    
                 $data['all_user']->draw = $_POST['draw'];
             }
             else {
-                $data['all_user'] = $this->m_user->get_all_user_("search", $_POST['search']['value']);
+                $data['all_user'] = $this->m_user->get_all_user("search", $_POST['search']['value']);
                 $data['all_user']->draw = $_POST['draw'];
             }
             
             echo json_encode($data['all_user']);
         }
-    } 
+    }
+
+    public function get_user_level() {
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            $data['user_level'] = $this->m_user->get_user_level();
+        }
+        // var_dump($data['user_level']->data[0]);exit;
+        echo json_encode($data['user_level']);
+    }
 }
 
 ?>
