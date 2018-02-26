@@ -36,6 +36,7 @@
                         <!-- <th>user_level_id</th> -->
                         <th>User Login</th>
                         <th>Name</th>
+                        <th>Email</th>
                         <!-- <th>Password</th> -->
                         <th>Status</th>
                         <!-- <th>Created At</th> -->
@@ -112,32 +113,44 @@
                 <form>
                     <div class="form-group">
                         <label for="lblUsername">Username</label>
-                        <input type="text" class="form-control" id="txtUsername" placeholder="Username">
+                        <input type="text" class="form-control" id="txtUsername" placeholder="Username" onfocusout="cekFormCreateNewUser('username')">
+                        <div class="alert alert-error" id="UsernameIsAlreadyTaken">
+                            <!-- <span>Looks like the username you entered already taken!</span> -->
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="lblName">Name</label>
                         <input type="text" class="form-control" id="txtName" placeholder="Name">
                     </div>
                     <div class="form-group">
+                        <label for="lblEmail">Email</label>
+                        <input type="text" class="form-control" id="txtEmail" placeholder="Email" onfocusout="cekFormCreateNewUser('email')">
+                        <div class="alert alert-error" id="EmailIsAlreadyExist">
+                            <!-- <span>Looks like the email you entered already exist!</span> -->
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="lblPassword">Password</label>
-                        <input type="text" class="form-control" id="txtPassword" placeholder="Password">
+                        <input type="password" class="form-control" id="txtPassword" placeholder="Password">
                     </div>
                     <div class="form-group">
                         <label for="lblUserLevel">User Level</label>
-                        <select class="form-control" id="userLevel" name="userLevel">
+                        <select class="form-control" id="DrdUserLevel" name="DrdUserLevel" onfocusout="cekFormCreateNewUser('userLevel')">
                         </select>
+                        <div class="alert alert-error" id="userLevelIsNull">
+                            <!-- <span>Looks like the email you entered already exist!</span> -->
+                        </div>
                     </div>
                     <div class="checkbox">
                         <label>
-                        <input type="checkbox" id="status"> Aktif
+                        <input type="checkbox" id="isAktif"> Aktif
                         </label>
                     </div>
-                    <button type="submit" class="btn btn-default">Submit</button>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-primary" id="createNewUser" onclick="createNewUser()">Save changes</button>
             </div>
         </div>
     </div>

@@ -128,7 +128,7 @@ class M_user extends CI_Model {
             array_push($result_arr, $col_arr);
             unset($col_arr);
         }
-        $result->data = $query->result_array();
+        $result = $query->result_array();
         /*
          *  =====================
          *  Hasilnya seperti ini:
@@ -136,7 +136,39 @@ class M_user extends CI_Model {
          *  =====================
          */
         // var_dump($result);exit;
-        return $result->data;
+        return $result;
+    }
+
+    public function get_user_login($type, $param) {
+        $result = new \stdClass();
+
+        if($type == 'userlogin') {
+            $this->db->select('*');
+            $this->db->from('user');
+            $this->db->where('user_login', $param);
+
+            $result->message = "Looks like the user login you entered already exist!";
+        } elseif($type == 'email') {
+            $this->db->select('*');
+            $this->db->from('user');
+            $this->db->where('email', $param);
+
+            $result->message = "Looks like the email you entered already exist!";
+        }
+
+        $query = $this->db->get();
+        $num_rows = $query->num_rows();
+
+        if($num_rows > 0) {
+            $result->count = $num_rows;
+        } else {
+            $result->message = "Free to go";
+            $result->count = $num_rows;
+        }
+
+        $result->data = $query->result_array();
+        // $result->message = ;
+        return $result;
     }
 }
 ?>
