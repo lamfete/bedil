@@ -2,7 +2,7 @@
 
 <footer class="footer">
     <div class="container">
-    <p class="text-muted">Place sticky footer content here.</p>
+        <p class="text-muted">© lamfete 2018</p>
     </div>
 </footer>
 
@@ -33,6 +33,9 @@
 <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.3/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" language="javascript" src="//cdn.datatables.net/responsive/1.0.2/js/dataTables.responsive.js"></script>
 <!--<script type="text/javascript" language="javascript" src="//cdn.datatables.net/plug-ins/a5734b29083/integration/bootstrap/3/dataTables.bootstrap.js"></script>-->
+
+<!-- My script -->
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/myscript.js"></script>
 
 </body>
 </html>

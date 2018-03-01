@@ -8,6 +8,8 @@ $(document).ready(function() {
     $('#EmailIsAlreadyExist').hide();
     $('#userLevelIsNull').hide();
     $('#createNewUser').prop('disabled', true);
+
+    // array untuk mengecek apakah semua field mandatory sudah diisi semua atau belum
     validation = [];
     // Initialization end here
 
@@ -39,14 +41,20 @@ $(document).ready(function() {
             { "data": [6] },
             // { "data": [7] },
             // { "data": [8] },
-            { "data": [9] },
-            { "data": [10] }
+            // { "data": [9] },
+            // { "data": [10] },
+            { "data": [11] },
+            { "data": [12] }
         ],
         "order": [[1, 'asc']]
     });
 } );
 
-// load user_level
+/*
+ * load user_level
+ * 
+ * 
+ */
 $.ajax({
     type: "POST",
     url: "userexec/get_user_level",
@@ -66,7 +74,33 @@ $.ajax({
     }
 });
 
+/*
+ * Function untuk mengosongkan semua textfield yang ada di form create new user
+ * 
+ * 
+ * 
+ */
+function clearCreateModalTextfield() {
+    $('#txtUsername').val("");
+    $('#txtName').val("");
+    $('#txtEmail').val("");
+    $('#txtPassword').val("");
+    $('#DrdUserLevel').val("0");
+    $('#isAktif').prop('checked', false); 
+    
+    validation = [];
+
+    enableButtonCreateNewUser();    
+}
+
+/*
+ * 
+ * 
+ * 
+ * 
+ */
 function createNewUser() {
+    var createdby = $('#userIdLogin').val();
     var userlogin = $('#txtUsername').val();
     var name = $('#txtName').val();
     var email = $('#txtEmail').val();
@@ -80,7 +114,29 @@ function createNewUser() {
         isaktif = "INAKTIF";
     }
 
-    console.log(userlevel);
+    $.ajax({
+        type: "POST",
+        url: "userexec/create_new_user",
+        data: {
+            userLevelId: userlevel,
+            userLogin: userlogin,
+            name: name,
+            email: email,
+            password: password,
+            status: isaktif,
+            createdBy: createdby
+        },
+        success: function(resp) {
+            // alert("SUKSES BUAT USER BARU");
+            alert(resp.message);
+            window.location.href = '/user';
+        },
+        error: function(resp) {
+            // alert("something went wrong");
+            alert('Error: ', resp.error);
+            window.location.href = '/user';
+        }
+    });
 }
 
 function editUser(value) {
@@ -101,8 +157,12 @@ function editUser(value) {
  * 
  */
 function enableButtonCreateNewUser() {
+    console.log("validation.length: " + validation.length);
     if(validation.length == 3) {
         $('#createNewUser').prop('disabled', false);
+    }
+    else {
+        $('#createNewUser').prop('disabled', true);
     }
 }
 
@@ -113,66 +173,74 @@ function enableButtonCreateNewUser() {
  * 
  */
 function cekFormCreateNewUser(param) {
-    // var validation = [];
-
     if(param=='username') {
         var username = $("#txtUsername").val();
 
-        $.ajax({
-            type: "POST",
-            url: "userexec/cek_create_new_user?param=username",
-            data: "userLogin=" + username,
-            success: function(resp) {
-                // console.log('Username ' + resp.data[0].user_login + ' sudah dipakai');
-                if(resp.count === 1) {
-                    $("#UsernameIsAlreadyTaken").html("<span>" + resp.message + "</span>");
-                    $('#UsernameIsAlreadyTaken').show();
-                } else {
-                    $('#UsernameIsAlreadyTaken').hide();
-                    
-                    if($.inArray("username", validation) == -1) {
-                        validation.push("username");    
+        if(username == '' && $.inArray(param, validation) > -1) {
+            removeElementOfArray(validation, param);
+            console.log(validation);
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "userexec/cek_create_new_user?param=username",
+                data: "userLogin=" + username,
+                success: function(resp) {
+                    // console.log('Username ' + resp.data[0].user_login + ' sudah dipakai');
+                    if(resp.count === 1) {
+                        $("#UsernameIsAlreadyTaken").html("<span>" + resp.message + "</span>");
+                        $('#UsernameIsAlreadyTaken').show();
+                    } else {
+                        $('#UsernameIsAlreadyTaken').hide();
+                        
+                        if($.inArray("username", validation) == -1) {
+                            validation.push("username");    
+                        }
+                        
+                        console.log(validation);
+                        enableButtonCreateNewUser();
                     }
-                    
-                    console.log(validation);
-                    enableButtonCreateNewUser();
+                },
+                error: function(resp) {
+                    console.log('Error: ', resp);
+                    alert("something went wrong");
+                    window.location.href = '/user';
                 }
-            },
-            error: function(resp) {
-                console.log('Error: ', resp);
-                alert("something went wrong");
-                window.location.href = '/user';
-            }
-        });
+            });
+        }
     } else if(param=="email") {
         var email = $("#txtEmail").val();
 
-        $.ajax({
-            type: "POST",
-            url: "userexec/cek_create_new_user?param=email",
-            data: "email=" + email,
-            success: function(resp) {
-                // console.log('Username ' + resp.data[0].user_login + ' sudah dipakai');
-                if(resp.count === 1) {
-                    $("#EmailIsAlreadyExist").html("<span>" + resp.message + "</span>");
-                    $('#EmailIsAlreadyExist').show();
-                } else {
-                    $('#EmailIsAlreadyExist').hide();
-                    
-                    if($.inArray("email", validation) == -1) {
-                        validation.push("email");
-                    }
+        if(email == '' && $.inArray(param, validation) > -1) {
+            removeElementOfArray(validation, param);
+            console.log(validation);
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "userexec/cek_create_new_user?param=email",
+                data: "email=" + email,
+                success: function(resp) {
+                    // console.log('Username ' + resp.data[0].user_login + ' sudah dipakai');
+                    if(resp.count === 1) {
+                        $("#EmailIsAlreadyExist").html("<span>" + resp.message + "</span>");
+                        $('#EmailIsAlreadyExist').show();
+                    } else {
+                        $('#EmailIsAlreadyExist').hide();
+                        
+                        if($.inArray("email", validation) == -1) {
+                            validation.push("email");
+                        }
 
-                    console.log(validation);
-                    enableButtonCreateNewUser();
+                        console.log(validation);
+                        enableButtonCreateNewUser();
+                    }
+                },
+                error: function(resp) {
+                    console.log('Error: ', resp);
+                    alert("something went wrong");
+                    window.location.href = '/user';
                 }
-            },
-            error: function(resp) {
-                console.log('Error: ', resp);
-                alert("something went wrong");
-                window.location.href = '/user';
-            }
-        });
+            });
+        }
     }
 
     else if(param=="userLevel") {
@@ -180,73 +248,23 @@ function cekFormCreateNewUser(param) {
         // console.log(userLevel);
         
         if(userLevel == 0) {
-            $("#userLevelIsNull").html("<span>Must choose one!</span>");
-            $("#userLevelIsNull").show();
+            if($.inArray(param, validation) > -1) {
+                removeElementOfArray(validation, param);
+                enableButtonCreateNewUser();
+                console.log(validation);
+            } else {
+                $("#userLevelIsNull").html("<span>Must choose one!</span>");
+                $("#userLevelIsNull").show();
+            }
         } else {
             $('#userLevelIsNull').hide();
 
-            if($.inArray("userlevel", validation) == -1) {
-                validation.push("userlevel");    
+            if($.inArray(param, validation) == -1) {
+                validation.push(param);    
             }
 
             console.log(validation);
             enableButtonCreateNewUser();
         }
     }
-
-    
 }
-
-/* 
- * Function untuk menampilkan detail datatables
- * 
- * Formatting function for row details - modify as you need 
- * 
- */
-function format ( d ) {
-    // `d` is the original data object for the row
-    return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
-        '<tr>'+
-            '<td>Name:</td>'+
-            '<td>'+d.name+'</td>'+
-        '</tr>'+
-        '<tr>'+
-            '<td>Status:</td>'+
-            '<td>'+d.status+'</td>'+
-        '</tr>'+
-        '<tr>'+
-            '<td>Password:</td>'+
-            '<td>'+d.password+'</td>'+
-        '</tr>'+
-        '<tr>'+
-            '<td>Extension number:</td>'+
-            '<td>'+d.created_at+'</td>'+
-        '</tr>'+
-        '<tr>'+
-            '<td>Extra info:</td>'+
-            '<td>'+d.updated_at+'</td>'+
-        '</tr>'+
-    '</table>';
-}
-
-/*
- * Function untuk show detail (klik tombol plus) di datatables
- * 
- * Add event listener for opening and closing details
- * 
- */
-$('#table_user tbody').on('click', 'td.details-control', function () {
-    var tr = $(this).closest('tr');
-    var row = table.row( tr );
-
-    if ( row.child.isShown() ) {
-        // This row is already open - close it
-        row.child.hide();
-        tr.removeClass('shown');
-    }
-    else {
-        // Open this row
-        row.child( format(row.data()) ).show();
-        tr.addClass('shown');
-    }
-} );

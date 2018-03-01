@@ -23,16 +23,40 @@ class Userexec extends CI_Controller {
         } else {
             $data['userlevel'] = $this->session->userdata('userlevel');
             $data['name'] = $this->m_login->get_name($this->session->userdata('username'));
+            $data['parameter']['start'] = $_POST['start'];
+            $data['parameter']['length'] = $_POST['length'];
+            $data['parameter']['search'] = $_POST['search']['value'];
+            $data['parameter']['draw'] = $_POST['draw'];
+
             if(empty($_POST['search']['value'])) {
-                $data['all_user'] = $this->m_user->get_all_user("all", "");    
+                $data['all_user'] = $this->m_user->get_all_user("all", $data['parameter']);  
                 $data['all_user']->draw = $_POST['draw'];
             }
             else {
-                $data['all_user'] = $this->m_user->get_all_user("search", $_POST['search']['value']);
+                $data['all_user'] = $this->m_user->get_all_user("search", $data['parameter']);
                 $data['all_user']->draw = $_POST['draw'];
             }
             // var_dump($data['all_user']);exit;
             // echo json_encode($data['all_user']);
+
+            $this->output
+            ->set_status_header(200)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($data['all_user'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+            ->_display();
+
+            exit;
+        }
+    }
+
+    public function get_user_() {
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            $data['parameter']['start'] = $_POST['start'];
+            $data['parameter']['length'] = $_POST['length'];
+            $data['all_user'] = $this->m_user->get_all_user_("all", $data['parameter']);  
+            $data['all_user']->draw = $_POST['draw'];
 
             $this->output
             ->set_status_header(200)
@@ -104,6 +128,28 @@ class Userexec extends CI_Controller {
 
             exit;
         // }
+    }
+
+    /*
+     * Function untuk insert new user
+     * 
+     */
+    public function create_new_user(){
+        // var_dump($_POST);
+        $data = $_POST;
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            $result = $this->m_user->set_new_user($data);
+        }
+
+        $this->output
+        ->set_status_header(200)
+        ->set_content_type('application/json', 'utf-8')
+        ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+        ->_display();
+
+        exit;
     }
 }
 

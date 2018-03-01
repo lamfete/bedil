@@ -10,7 +10,7 @@
         <?php
             if($userlevel->user_level_id == 1) {
         ?>
-        <button type="button" class="btn btn-lg" data-toggle="modal" data-target="#createModal">
+        <button type="button" class="btn btn-lg" data-toggle="modal" data-target="#createModal" onclick="clearCreateModalTextfield()">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             Add new user
         </button>
@@ -108,8 +108,8 @@
                 <h4 class="modal-title" id="myModalLabel">Create User</h4>
             </div>
             <div class="modal-body">
-                <p id='tes'></p>
-                <!-- <input type="text" id="username" class="form-control"> -->
+                <!-- <p id='tes'></p> -->
+                <input type="hidden" id="userIdLogin" value="<?php echo $name->user_id; ?>">
                 <form>
                     <div class="form-group">
                         <label for="lblUsername">Username</label>

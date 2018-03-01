@@ -33,6 +33,7 @@ class M_login extends CI_Model {
     public function get_name($username) {
         $this->db->select('user_login');
         $this->db->select('name');
+        $this->db->select('user_id');
         $this->db->from('user');
         $this->db->where('user_login', $username);
 
