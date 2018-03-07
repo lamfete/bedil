@@ -18,24 +18,39 @@
 
 <!-- DataTables JavaScript
 ================================================== -->
-<!--<script type="text/javascript" src="<?php echo base_url(); ?>assets/DataTables/DataTables-1.10.16/js/jquery.dataTables.js"></script>-->
-<!-- <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script> -->
+<!--<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.3/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" language="javascript" src="//cdn.datatables.net/responsive/1.0.2/js/dataTables.responsive.js"></script>-->
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/DataTables/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/DataTables/dataTables.responsive.js"></script>
 
-<!-- DataTables jQuery -->
-<!--<script src="<?php echo base_url(); ?>assets/DataTables/DataTables-1.10.16/js/jquery.dataTables.min.js"></script>-->
-<!--<script src="<?php echo base_url(); ?>assets/DataTables/DataTables-1.10.16/js/dataTables.bootstrap.min.js"></script>-->
-
-<!-- Responsive js -->
-<!--<script src="<?php echo base_url(); ?>assets/DataTables/Responsive-2.2.1/dataTables.responsive.min.js"></script>-->
-<!--<script src="<?php // echo base_url(); ?>assets/DataTables/Responsive-2.2.1/responsive.bootstrap.min.js"></script>-->
-
-<!--<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
-<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.3/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" language="javascript" src="//cdn.datatables.net/responsive/1.0.2/js/dataTables.responsive.js"></script>
-<!--<script type="text/javascript" language="javascript" src="//cdn.datatables.net/plug-ins/a5734b29083/integration/bootstrap/3/dataTables.bootstrap.js"></script>-->
+<!-- nprogress script -->
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/nprogress/nprogress.js"></script>
 
 <!-- My script -->
 <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/myscript.js"></script>
+
+<script>
+
+// Show the progress bar 
+NProgress.start();
+
+// Increase randomly
+// var interval = setInterval(function() { NProgress.inc(); }, 1000);        
+
+// Trigger finish when page fully loaded
+// jQuery(window).load(function () {
+//     clearInterval(interval);
+//     NProgress.done();
+// });
+
+// // Trigger bar when exiting the page
+// jQuery(window).unload(function () {
+//     NProgress.start();
+// });
+
+NProgress.done();
+
+</script>
 
 </body>
 </html>

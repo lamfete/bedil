@@ -107,6 +107,7 @@ function createNewUser() {
     var password = $('#txtPassword').val();
     var userlevel = $('#DrdUserLevel').val();
     var isaktif = "";
+    NProgress.start();
 
     if($('#isAktif').is(':checked')) {
         isaktif = "AKTIF";
@@ -128,11 +129,13 @@ function createNewUser() {
         },
         success: function(resp) {
             // alert("SUKSES BUAT USER BARU");
+            NProgress.done();
             alert(resp.message);
             window.location.href = '/user';
         },
         error: function(resp) {
             // alert("something went wrong");
+            NProgress.done();
             alert('Error: ', resp.message);
             window.location.href = '/user';
         }
@@ -165,7 +168,7 @@ function editUser(value) {
  */
 function deleteUser(value) {
     // console.log(value[4]);
-
+    NProgress.start();
     var deleteRecord = confirm("Yakin hapus data user " + value[2] + " dari database?");
 
     if(deleteRecord == true) {
@@ -179,11 +182,13 @@ function deleteUser(value) {
             },
             success: function(resp) {
                 // alert("BERHASIL DELETE USER");
+                NProgress.done();
                 alert(resp.message);
                 window.location.href = '/user';
             },
             error: function(resp) {
                 // alert("something went wrong");
+                NProgress.done();
                 alert('Error: ', resp.message);
                 window.location.href = '/user';
             }
@@ -193,7 +198,7 @@ function deleteUser(value) {
 
 function updateUser() {
     var isaktif = "";
-
+    NProgress.start();
     if($('#statusEdit').is(':checked')) {
         isaktif = "AKTIF";
     } else {
@@ -216,11 +221,13 @@ function updateUser() {
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
+                NProgress.done();
                 alert(resp.message);
                 window.location.href = '/user';
             },
             error: function(resp) {
                 // alert("something went wrong");
+                NProgress.done();
                 alert('Error: ', resp.message);
                 window.location.href = '/user';
             }
@@ -253,6 +260,7 @@ function enableButtonCreateNewUser() {
 function cekFormCreateNewUser(param) {
     if(param=='username') {
         var username = $("#txtUsername").val();
+        NProgress.start();
 
         if(username == '' && $.inArray(param, validation) > -1) {
             removeElementOfArray(validation, param);
@@ -277,16 +285,19 @@ function cekFormCreateNewUser(param) {
                         console.log(validation);
                         enableButtonCreateNewUser();
                     }
+                    NProgress.done();
                 },
                 error: function(resp) {
                     console.log('Error: ', resp);
                     alert("something went wrong");
                     window.location.href = '/user';
+                    NProgress.done();
                 }
             });
         }
     } else if(param=="email") {
         var email = $("#txtEmail").val();
+        NProgress.start();
 
         if(email == '' && $.inArray(param, validation) > -1) {
             removeElementOfArray(validation, param);
@@ -311,11 +322,13 @@ function cekFormCreateNewUser(param) {
                         console.log(validation);
                         enableButtonCreateNewUser();
                     }
+                    NProgress.done();
                 },
                 error: function(resp) {
                     console.log('Error: ', resp);
                     alert("something went wrong");
                     window.location.href = '/user';
+                    NProgress.done();
                 }
             });
         }
@@ -324,15 +337,18 @@ function cekFormCreateNewUser(param) {
     else if(param=="userLevel") {
         var userLevel = $("#DrdUserLevel").val();
         // console.log(userLevel);
+        NProgress.start();
         
         if(userLevel == 0) {
             if($.inArray(param, validation) > -1) {
                 removeElementOfArray(validation, param);
                 enableButtonCreateNewUser();
                 console.log(validation);
+                NProgress.done();
             } else {
                 $("#userLevelIsNull").html("<span>Must choose one!</span>");
                 $("#userLevelIsNull").show();
+                NProgress.done();
             }
         } else {
             $('#userLevelIsNull').hide();
@@ -343,6 +359,7 @@ function cekFormCreateNewUser(param) {
 
             console.log(validation);
             enableButtonCreateNewUser();
+            NProgress.done();
         }
     }
 }
