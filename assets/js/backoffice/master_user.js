@@ -133,20 +133,98 @@ function createNewUser() {
         },
         error: function(resp) {
             // alert("something went wrong");
-            alert('Error: ', resp.error);
+            alert('Error: ', resp.message);
             window.location.href = '/user';
         }
     });
 }
 
+/*
+ * function untuk mengisi modal edit user
+ * 
+ * 
+ * 
+ */
 function editUser(value) {
-    $('#user_login').val(value[2]);
-    $('#name').val(value[3]);
-    if(value[5]=='AKTIF'){  
-        $('#status').prop('checked', true);
+    $('#idUser').val(value[0]);
+    $('#txtUserloginEdit').val(value[2]);
+    $('#txtNameEdit').val(value[3]);
+    $('#txtEmailEdit').val(value[4]);
+    if(value[6]=='AKTIF'){  
+        $('#statusEdit').prop('checked', true);
     }
     else {
-        $('#status').prop('checked', false);
+        $('#statusEdit').prop('checked', false);
+    }
+};
+
+/*
+ * function untuk delete user
+ * 
+ * 
+ */
+function deleteUser(value) {
+    // console.log(value[4]);
+
+    var deleteRecord = confirm("Yakin hapus data user " + value[2] + " dari database?");
+
+    if(deleteRecord == true) {
+        $.ajax({
+            type: "POST",
+            url: "userexec/delete_user",
+            data: {
+                userId: value[0],
+                userLogin: value[2],
+                createdBy: $('#userIdLogin').val()
+            },
+            success: function(resp) {
+                // alert("BERHASIL DELETE USER");
+                alert(resp.message);
+                window.location.href = '/user';
+            },
+            error: function(resp) {
+                // alert("something went wrong");
+                alert('Error: ', resp.message);
+                window.location.href = '/user';
+            }
+        });
+    }
+};
+
+function updateUser() {
+    var isaktif = "";
+
+    if($('#statusEdit').is(':checked')) {
+        isaktif = "AKTIF";
+    } else {
+        isaktif = "INAKTIF";
+    }
+    // console.log($('#userIdLogin').val() + ' ; ' + $('#idUser').val() + ' ; ' + $('#txtUserloginEdit').val() + ' ; ' + $('#name').val() + ' ; ' + $('#email').val() + ' ; ' + isaktif);
+    var updateRecord = confirm("Yakin update data user " + $('#txtNameEdit').val() + "?");
+
+    if(updateRecord == true) {
+        $.ajax({
+            type: "POST",
+            url: "userexec/update_user",
+            data: {
+                userId: $('#idUser').val(),
+                userLogin: $('#txtUserloginEdit').val(),
+                name: $('#txtNameEdit').val(),
+                email: $('#txtEmailEdit').val(),
+                status: isaktif,
+                updatedBy: $('#userIdLogin').val()
+            },
+            success: function(resp) {
+                // alert("BERHASIL UPDATE USER");
+                alert(resp.message);
+                window.location.href = '/user';
+            },
+            error: function(resp) {
+                // alert("something went wrong");
+                alert('Error: ', resp.message);
+                window.location.href = '/user';
+            }
+        });
     }
 };
 
@@ -182,7 +260,7 @@ function cekFormCreateNewUser(param) {
         } else {
             $.ajax({
                 type: "POST",
-                url: "userexec/cek_create_new_user?param=username",
+                url: "userexec/cek_user?param=username",
                 data: "userLogin=" + username,
                 success: function(resp) {
                     // console.log('Username ' + resp.data[0].user_login + ' sudah dipakai');
@@ -216,7 +294,7 @@ function cekFormCreateNewUser(param) {
         } else {
             $.ajax({
                 type: "POST",
-                url: "userexec/cek_create_new_user?param=email",
+                url: "userexec/cek_user?param=email",
                 data: "email=" + email,
                 success: function(resp) {
                     // console.log('Username ' + resp.data[0].user_login + ' sudah dipakai');

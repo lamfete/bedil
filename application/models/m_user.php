@@ -7,58 +7,18 @@ class M_user extends CI_Model {
         parent::__construct();
     }
 
-    public function get_all_user_($type, $input) {
-        $result = new stdClass();
-        
-        $result_arr = array();
-        echo $input['length'];
-        if($type=="all") {
-            // $this->db->select('user.user_id as user_id, user.user_login as username, user.name as name, user.password as password, user.status as status, user_level.user_level_name as user_level');
-            $this->db->select('*');
-            $this->db->from('user');
-            $this->db->join('user_level', 'user.user_level_id = user_level.user_level_id', 'left');
-            // $this->db->limit($input['length'], $input['start']);
-        } elseif($type=="search") {
-            $this->db->select('*');
-            $this->db->from('user');
-            $this->db->join('user_level', 'user.user_level_id = user_level.user_level_id', 'left');
-            $this->db->like('user_login', $input);
-            $this->db->or_like('name', $input);
-        }
-
-        $query = $this->db->get();
-
-        // get item all item rows
-        $item_rows_count = $this->db->get('user');
-        $num_rows = $item_rows_count->num_rows();
-
-        $result->draw = 1;
-        $result->recordsTotal = $num_rows;
-        $result->recordsFiltered = $num_rows;
-        
-        for($i=0; $i<$result->recordsTotal; $i++) {
-            $col_arr = array();
-            
-            foreach($query->result_array()[$i] as $key => $value) {
-                array_push($col_arr, $value);
-            }
-            $implode = json_encode($col_arr);
-            array_push($col_arr, "<a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editUser(".$implode.")'>Edit</a>");
-            
-            array_push($result_arr, $col_arr);
-            unset($col_arr);
-        }
-        $result->data = $result_arr;
-        // var_dump($result);exit;
-        return $result;
-    }
-
     public function get_all_user($type, $input) {
         $result = new stdClass();
         $result_arr = array();
 
         if($type=="all") {
             // var_dump($input);exit;
+
+            /*
+             * query untuk isi datatable
+             * 
+             * 
+             */
             $sql1 = "
                 select u.*, ul.*
                 from user u
@@ -67,6 +27,10 @@ class M_user extends CI_Model {
                 limit ".$input['start'].", ".$input['length'].";
             ";
             
+            /*
+             * query untuk jumlah items
+             * 
+             */
             $sql2 = "
                 select * from user;
             ";
@@ -109,7 +73,10 @@ class M_user extends CI_Model {
                 array_push($col_arr, $value);
             }
             $implode = json_encode($col_arr);
-            array_push($col_arr, "<a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editUser(".$implode.")'>Edit</a>");
+            array_push($col_arr, "
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editUser(".$implode.")'>Edit</a>
+                <a class='btn btn-default' role='button' onclick='deleteUser(".$implode.")'>Delete</a>
+            ");
             
             array_push($result_arr, $col_arr);
             unset($col_arr);
@@ -202,10 +169,19 @@ class M_user extends CI_Model {
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
-        
-        $query = $this->db->insert('user', $data);
 
-        if($query) {
+        $log = array(
+            'tindakan' => $_SESSION['username'] . " CREATE NEW USER " . $param['userLogin'],
+            'created_at' => date("Y-m-d H:i:s"),
+            'created_by' => $param['createdBy']
+        );
+        
+        $this->db->trans_start();
+        $q1 = $this->db->insert('user', $data);
+        $q2 = $this->db->insert('user_log', $log);
+        $this->db->trans_complete();
+        /*
+        if($q1) {
             $result->message = "Successfully create new user";
             return $result;
         }
@@ -214,7 +190,85 @@ class M_user extends CI_Model {
             $result->error = $this->db->error();
             return $result;
         }
+        */
 
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $result->message = "Something went wrong";
+            // $result->error = $this->db->error();
+            $result->error = $this->db->_error_message();
+            return $result;
+        }
+        else {
+            $this->db->trans_commit();
+            $result->message = "Successfully create new user";
+            return $result;
+        }
+    }
+
+    public function delete_user($param) {
+        $result = new \stdClass();
+
+        $log = array(
+            'tindakan' => $_SESSION['username'] . " DELETE USER " . $param['userLogin'],
+            'created_at' => date("Y-m-d H:i:s"),
+            'created_by' => $param['createdBy']
+        );
+
+        $this->db->trans_start();
+        $this->db->delete('user', array('user_id' => $param['userId']));
+        $this->db->insert('user_log', $log);
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $result->message = "Something went wrong";
+            // $result->error = $this->db->error();
+            $result->error = $this->db->_error_message();
+            return $result;
+        }
+        else {
+            $this->db->trans_commit();
+            $result->message = "Successfully delete user";
+            return $result;
+        }
+    }
+
+    public function update_user($param) {
+        $result = new \stdClass();
+        // var_dump($param);exit;
+        $data = array(
+            'name' => $param['name'],
+            'email' => $param['email'],
+            'status' => $param['status'],
+            'updated_at' => date("Y-m-d H:i:s"),
+            'updated_by' => $param['updatedBy']
+        );
+
+        $log = array(
+            'tindakan' => $_SESSION['username'] . " UPDATE USER " . $param['userLogin'],
+            'created_at' => date("Y-m-d H:i:s"),
+            'created_by' => $param['updatedBy']
+        );
+
+        $this->db->trans_start();
+        $this->db->where('user_id', $param['userId']);
+        $this->db->update('user', $data);
+        $this->db->insert('user_log', $log);
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $result->message = "Something went wrong";
+            // $result->error = $this->db->error();
+            $result->error = $this->db->_error_message();
+            return $result;
+        }
+        else {
+            $this->db->trans_commit();
+            $result->message = "Successfully update user";
+            return $result;
+        }
     }
 }
 ?>

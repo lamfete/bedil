@@ -14,6 +14,8 @@ class Userexec extends CI_Controller {
     /*
      * Function untuk mendapatkan isi dari table user
      * 
+     * Pagination ngikut datatables
+     * 
      */
     public function get_user() {
         // $data['all_user'] = new \stdClass();
@@ -38,25 +40,6 @@ class Userexec extends CI_Controller {
             }
             // var_dump($data['all_user']);exit;
             // echo json_encode($data['all_user']);
-
-            $this->output
-            ->set_status_header(200)
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($data['all_user'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
-            ->_display();
-
-            exit;
-        }
-    }
-
-    public function get_user_() {
-        if($this->session->userdata('isLogin') == FALSE) {
-            redirect('login/form');
-        } else {
-            $data['parameter']['start'] = $_POST['start'];
-            $data['parameter']['length'] = $_POST['length'];
-            $data['all_user'] = $this->m_user->get_all_user_("all", $data['parameter']);  
-            $data['all_user']->draw = $_POST['draw'];
 
             $this->output
             ->set_status_header(200)
@@ -94,7 +77,7 @@ class Userexec extends CI_Controller {
      * Function untuk mengecek apakah di table user sudah ada atau belum
      * 
      */ 
-    public function cek_create_new_user() {
+    public function cek_user() {
         // untuk keperluan debug, tutup pengecekan session
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
@@ -141,6 +124,52 @@ class Userexec extends CI_Controller {
             redirect('login/form');
         } else {
             $result = $this->m_user->set_new_user($data);
+        }
+
+        $this->output
+        ->set_status_header(200)
+        ->set_content_type('application/json', 'utf-8')
+        ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+        ->_display();
+
+        exit;
+    }
+
+    /*
+     * Function untuk delete user
+     * 
+     */
+    public function delete_user(){
+        // var_dump($_POST);
+        $data = $_POST;
+        
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            $result = $this->m_user->delete_user($data);
+        }
+
+        $this->output
+        ->set_status_header(200)
+        ->set_content_type('application/json', 'utf-8')
+        ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+        ->_display();
+
+        exit;
+    }
+
+    /*
+     * Function untuk update user
+     * 
+     */
+    public function update_user(){
+        // var_dump($_POST);
+        $data = $_POST;
+        
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            $result = $this->m_user->update_user($data);
         }
 
         $this->output

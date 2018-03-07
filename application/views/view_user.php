@@ -72,28 +72,31 @@
                 <h4 class="modal-title" id="myModalLabel">Edit User</h4>
             </div>
             <div class="modal-body">
-                <p id='tes'></p>
-                <!-- <input type="text" id="username" class="form-control"> -->
+                <input type="hidden" id="userIdLogin" value="<?php echo $name->user_id; ?>"> <!-- userId yang login -->
+                <input type="hidden" id="idUser"> <!-- userId record yg hendak di edit -->
                 <form>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Username</label>
-                        <input type="text" class="form-control" id="user_login" placeholder="Username" disabled>
+                        <input type="text" class="form-control" id="txtUserloginEdit" placeholder="Username" disabled>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Name</label>
-                        <input type="text" class="form-control" id="name" placeholder="Name">
+                        <label for="nameEdit">Name</label>
+                        <input type="text" class="form-control" id="txtNameEdit" placeholder="Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailEdit">Email</label>
+                        <input type="text" class="form-control" id="txtEmailEdit" placeholder="Email" onfocusout="cekFormEdiUser('email')">
                     </div>
                     <div class="checkbox">
                         <label>
-                        <input type="checkbox" id="status"> Aktif
+                        <input type="checkbox" id="statusEdit"> Aktif
                         </label>
                     </div>
-                    <button type="submit" class="btn btn-default">Submit</button>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-primary" id="updateUser" onclick="updateUser()">Save changes</button>
             </div>
         </div>
     </div>
@@ -108,7 +111,6 @@
                 <h4 class="modal-title" id="myModalLabel">Create User</h4>
             </div>
             <div class="modal-body">
-                <!-- <p id='tes'></p> -->
                 <input type="hidden" id="userIdLogin" value="<?php echo $name->user_id; ?>">
                 <form>
                     <div class="form-group">
