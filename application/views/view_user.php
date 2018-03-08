@@ -85,7 +85,7 @@
                     </div>
                     <div class="form-group">
                         <label for="emailEdit">Email</label>
-                        <input type="text" class="form-control" id="txtEmailEdit" placeholder="Email" onfocusout="cekFormEditUser('email')">
+                        <input type="text" class="form-control" id="txtEmailEdit" placeholder="Email" onfocusout="cekFormEdiUser('email')">
                     </div>
                     <div class="checkbox">
                         <label>

@@ -17,15 +17,18 @@
     <link rel="stylesheet" type="text/css" href="assets/DataTables/DataTables-1.10.16/css/dataTables.bootstrap.css"/>
     <link rel="stylesheet" type="text/css" href="assets/DataTables/Responsive-2.2.1/css/responsive.bootstrap.min.css"/>
 
-    <!-- nprogress css -->
-    <link rel="stylesheet" type="text/css" href="assets/nprogress/nprogress.css"/>
-
     <!-- Custom styles for this template -->
     <link href="assets/style/theme.css" rel="stylesheet">
+
+    <!--<link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/DataTables/DataTables-1.10.16/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/DataTables/Responsive-2.2.1/css/responsive.bootstrap.min.css">-->
 
     <!-- jQuery -->
     <script src="<?php echo base_url(); ?>assets/js/jquery/jquery-3.3.1.js"></script>
 
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>-->
+    <!--<link rel="stylesheet" href="http://cdn.datatables.net/plug-ins/a5734b29083/integration/bootstrap/3/dataTables.bootstrap.css"/> -->
+    <!--<link rel="stylesheet" href="http://cdn.datatables.net/responsive/1.0.2/css/dataTables.responsive.css"/>-->
     <style>
         /*body {
             font-size: 140%;
@@ -68,11 +71,13 @@
                         <li><a href="#">One more separated link</a></li>
                         </ul>
                     </li>
-
-                    <?php if($userlevel->user_level_id == 1) { ?>
+                    <?php
+                        // if($userlevel->user_level_id == 1) {
+                    ?>
                     <li><a href="<?php echo "/user"; ?>">User</a></li>
-                    <?php } ?>
-
+                    <?php
+                        // }
+                    ?>
                     <li><a href="#contact">Contact</a></li>
                     <li><a href="<?php echo "/login/logout"; ?>">Logout</a></li>
                     </ul>
