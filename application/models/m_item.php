@@ -81,7 +81,7 @@ class M_item extends CI_Model {
             $implode = json_encode($col_arr);
             array_push($col_arr, "
                 <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editItem(".$implode.")'>Edit</a>
-                <a class='btn btn-default' role='button' onclick='deleteUser(".$implode.")'>Delete</a>
+                <a class='btn btn-default' role='button' onclick='deleteItem(".$implode.")'>Delete</a>
             ");
             
             array_push($result_arr, $col_arr);
@@ -295,17 +295,17 @@ class M_item extends CI_Model {
         }
     }
 
-    public function delete_user($param) {
+    public function delete_item($param) {
         $result = new \stdClass();
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " DELETE USER " . $param['userLogin'],
+            'tindakan' => $_SESSION['username'] . " DELETE ITEM " . $param['itemName'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
 
         $this->db->trans_start();
-        $this->db->delete('user', array('user_id' => $param['userId']));
+        $this->db->delete('item', array('item_id' => $param['itemId']));
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -318,7 +318,7 @@ class M_item extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully delete user";
+            $result->message = "Successfully delete item";
             return $result;
         }
     }

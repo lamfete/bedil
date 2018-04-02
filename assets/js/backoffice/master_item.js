@@ -400,17 +400,17 @@ function editItem(value) {
  * 
  */
 function deleteItem(value) {
-    // console.log(value[4]);
+    // console.log(value);
 
-    var deleteRecord = confirm("Yakin hapus data item " + value[2] + " dari database?");
+    var deleteRecord = confirm("Yakin hapus data item " + value[0] + " dari database?");
 
     if(deleteRecord == true) {
         $.ajax({
             type: "POST",
-            url: "userexec/delete_user",
+            url: "itemexec/delete_item",
             data: {
-                userId: value[0],
-                userLogin: value[2],
+                itemId: value[0],
+                itemName: value[4],
                 createdBy: $('#userIdLogin').val()
             },
             success: function(resp) {

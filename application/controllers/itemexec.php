@@ -205,14 +205,14 @@ class Itemexec extends CI_Controller {
      * Function untuk delete user
      * 
      */
-    public function delete_user(){
-        // var_dump($_POST);
+    public function delete_item(){
+        // var_dump($_POST);exit;
         $data = $_POST;
         
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
-            $result = $this->m_user->delete_user($data);
+            $result = $this->m_item->delete_item($data);
         }
 
         $this->output
