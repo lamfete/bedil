@@ -67,7 +67,7 @@
                         <li><a href="#">Type</a></li>
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">Nav header</li>
-                        <li><a href="#">Item</a></li>
+                        <li><a href="/item">Item</a></li>
                         <li><a href="#">One more separated link</a></li>
                         </ul>
                     </li>
