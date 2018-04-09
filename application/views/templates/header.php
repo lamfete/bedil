@@ -62,9 +62,9 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Master <span class="caret"></span></a>
                         <ul class="dropdown-menu">
+                        <li><a href="/category">Category</a></li>
+                        <li><a href="/type">Type</a></li>
                         <li><a href="/brand">Brand</a></li>
-                        <li><a href="#">Category</a></li>
-                        <li><a href="#">Type</a></li>
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">Nav header</li>
                         <li><a href="/item">Item</a></li>
