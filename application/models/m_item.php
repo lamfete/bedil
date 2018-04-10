@@ -338,7 +338,7 @@ class M_item extends CI_Model {
         );
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " UPDATE ITEM " . $param['itemId'],
+            'tindakan' => $_SESSION['username'] . " UPDATE ITEM " . $param['itemName'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );

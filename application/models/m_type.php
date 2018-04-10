@@ -1,13 +1,13 @@
 <?php
 if(!defined('BASEPATH')) exit('Hacking Attempt');
 
-class M_category extends CI_Model {
+class M_type extends CI_Model {
 
     public function __construct() {
         parent::__construct();
     }
 
-    public function get_all_category($type, $input) {
+    public function get_all_type($type, $input) {
         $result = new stdClass();
         $result_arr = array();
 
@@ -20,8 +20,9 @@ class M_category extends CI_Model {
              * 
              */
             $sql1 = "
-                select category_id, category_name, created_at, category_status
-                from category
+                select t.type_id, c.category_name, t.type_name, t.created_at, t.type_status
+                from type t
+                left join category c on t.category_id = c.category_id
                 limit ".$input['start'].", ".$input['length'].";
             ";
             
@@ -30,7 +31,7 @@ class M_category extends CI_Model {
              * 
              */
             $sql2 = "
-                select * from category;
+                select * from type;
             ";
 
             $q1 = $this->db->query($sql1);
@@ -42,10 +43,11 @@ class M_category extends CI_Model {
             $num_rows = count($q2->result());
         } elseif($type=="search") {
             $sql1 = "
-                select category_id, category_name, created_at, category_status
-                from category
-                where category_id like '%".$input['search']."%'
-                or category_name like '%".$input['search']."%'
+                select t.type_id, c.category_name, t.type_name, t.created_at, t.type_status
+                from type t
+                left join category c on t.category_id = c.category_id
+                where t.type_id like '%".$input['search']."%'
+                or t.type_name like '%".$input['search']."%'
                 limit ".$input['start'].", ".$input['length'].";
             ";
 
@@ -71,8 +73,8 @@ class M_category extends CI_Model {
             }
             $implode = json_encode($col_arr);
             array_push($col_arr, "
-                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editCategory(".$implode.")'>Edit</a>
-                <a class='btn btn-default' role='button' onclick='deleteCategory(".$implode.")'>Delete</a>
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editType(".$implode.")'>Edit</a>
+                <a class='btn btn-default' role='button' onclick='deleteType(".$implode.")'>Delete</a>
             ");
             
             array_push($result_arr, $col_arr);
@@ -83,7 +85,7 @@ class M_category extends CI_Model {
         return $result;
     }
 
-    public function get_cat_category(){
+    public function get_cat_type(){
         $result = new stdClass();
         
         $result_arr = array();
@@ -199,21 +201,22 @@ class M_category extends CI_Model {
         return $result;
     }
 
-    public function get_category($type, $param) {
+    public function get_type($type, $param) {
         $result = new \stdClass();
         
-        if($type == 'category') {
+        if($type == 'type') {
             $this->db->select('*');
-            $this->db->from('category');
-            $this->db->where('category_name', $param['name']);
+            $this->db->from('type');
+            $this->db->where('category_id', $param['cat']);
+            $this->db->where('type_name', $param['name']);
 
             $result->message = "Looks like the item you entered already exist!";
         } 
-        elseif($type == 'categorydetail') {
+        elseif($type == 'typedetail') {
             // var_dump($param);exit;
             $this->db->select('*');
-            $this->db->from('category');
-            $this->db->where('category_id', $param);
+            $this->db->from('type');
+            $this->db->where('type_id', $param);
 
             $result->message = "Ok!";
         }
@@ -233,24 +236,25 @@ class M_category extends CI_Model {
         return $result;
     }
 
-    public function set_new_category($param) {
+    public function set_new_type($param) {
         $result = new \stdClass();
         // var_dump($param["name"]);
 
         $data = array(
-            'category_name' => $param['categoryName'],
-            'category_status' => $param['isAktif'],
+            'category_id' => $param['typeCat'],
+            'type_name' => $param['typeName'],
+            'type_status' => $param['isAktif'],
             'created_by' => $param['createdBy']
         );
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " CREATE NEW CATEGORY " . $param['categoryName'],
+            'tindakan' => $_SESSION['username'] . " CREATE NEW TYPE " . $param['typeName'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
         
         $this->db->trans_start();
-        $q1 = $this->db->insert('category', $data);
+        $q1 = $this->db->insert('type', $data);
         $q2 = $this->db->insert('user_log', $log);
         $this->db->trans_complete();
         /*
@@ -274,22 +278,22 @@ class M_category extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully create new category";
+            $result->message = "Successfully create new type";
             return $result;
         }
     }
 
-    public function delete_category($param) {
+    public function delete_type($param) {
         $result = new \stdClass();
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " DELETE CATEGORY " . $param['categoryName'],
+            'tindakan' => $_SESSION['username'] . " DELETE TYPE " . $param['typeName'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
 
         $this->db->trans_start();
-        $this->db->delete('category', array('category_id' => $param['categoryId']));
+        $this->db->delete('type', array('type_id' => $param['typeId']));
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -302,31 +306,32 @@ class M_category extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully delete category";
+            $result->message = "Successfully delete type";
             return $result;
         }
     }
 
-    public function update_category($param) {
+    public function update_type($param) {
         $result = new \stdClass();
         // var_dump($param);exit;
         $data = array(
             'category_id' => $param['categoryId'],
-            'category_name' => $param['categoryName'],
-            'category_status' => $param['categoryStatus'],
+            'type_id' => $param['typeId'],
+            'type_name' => $param['typeName'],
+            'type_status' => $param['typeStatus'],
             'updated_at' => date("Y-m-d H:i:s"),
             'updated_by' => $param['updatedBy']
         );
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " UPDATE CATEGORY " . $param['categoryName'],
+            'tindakan' => $_SESSION['username'] . " UPDATE TYPE " . $param['typeName'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
 
         $this->db->trans_start();
-        $this->db->where('category_id', $param['categoryId']);
-        $this->db->update('category', $data);
+        $this->db->where('type_id', $param['typeId']);
+        $this->db->update('type', $data);
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -339,7 +344,7 @@ class M_category extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update category";
+            $result->message = "Successfully update type";
             return $result;
         }
     }
