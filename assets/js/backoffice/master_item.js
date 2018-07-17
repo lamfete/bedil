@@ -34,7 +34,7 @@ $(document).ready(function() {
         "bAutowidth": false,
         "ajax": {
             //url: '<?php echo base_url('userexec/get_user'); ?>',
-            url: 'itemexec/get_item',
+            url: 'itemexec/get_item?type=datatables',
             type: 'POST'
         },
         "columns": [

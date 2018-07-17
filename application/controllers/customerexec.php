@@ -1,12 +1,12 @@
 <?php
 if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
 
-class Itemexec extends CI_Controller {
+class Customerexec extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
         $this->load->model('m_login');
-        $this->load->model('m_item');
+        $this->load->model('m_customer');
         $this->load->helper('url');
         $this->load->library(array('session'));
     }
@@ -61,14 +61,14 @@ class Itemexec extends CI_Controller {
      * 
      * 
      */
-    public function get_id_item() {
+    public function get_customer_id() {
         // $data['all_user'] = new \stdClass();
         $type = $_GET['type'];
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
             if($type == 'autocomplete') {
-                $data['all_item'] = $this->m_item->get_id_item("autocomplete", $_GET['query']);
+                $data['all_customer'] = $this->m_customer->get_customer_id("autocomplete", $_GET['query']);
             }
             // var_dump($data['all_user']);exit;
             // echo json_encode($data['all_user']);
@@ -76,7 +76,7 @@ class Itemexec extends CI_Controller {
             $this->output
             ->set_status_header(200)
             ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($data['all_item'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+            ->set_output(json_encode($data['all_customer'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
             ->_display();
 
             exit;

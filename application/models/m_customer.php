@@ -1,7 +1,7 @@
 <?php
 if(!defined('BASEPATH')) exit('Hacking Attempt');
 
-class M_item extends CI_Model {
+class M_customer extends CI_Model {
 
     public function __construct() {
         parent::__construct();
@@ -213,17 +213,17 @@ class M_item extends CI_Model {
      * Mendapatkan semua item_id yang ada di table item
      * 
      */
-    public function get_id_item($type, $input) {
+    public function get_customer_id($type, $input) {
         $result = new stdClass();
         $result_arr = array();
 
         if($type=="autocomplete") {
             
             $sql1 = "
-                select concat(item_id, ' - ', item_name) as item_id
-                from item
-                where item_id like '%".$input."%'
-                or item_name like '%".$input."%';
+                select concat(customer_id, ' - ', customer_address_name) as customer_id
+                from customer_address
+                where customer_id like '%".$input."%'
+                or customer_address_name like '%".$input."%';
             ";
 
             $q1 = $this->db->query($sql1);

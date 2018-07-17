@@ -31,11 +31,12 @@ class Login extends CI_Controller {
         } else {
             $username = $this->input->post('username');
             $password = $this->input->post('password');
-
+            
             // check user level
             $user_level = $this->m_login->get_user_level($username, $password);
             $data['user_level'] = $user_level;
-            $cek = $this->m_login->get_name($username, $password, $user_level);
+            $cek = $this->m_login->get_login($username, $password, 'AKTIF');
+            
             if($cek <> 0) {
                 $this->session->set_userdata('isLogin', TRUE);
                 $this->session->set_userdata('username', $username);
