@@ -1,7 +1,7 @@
 <?php
 if(!defined('BASEPATH')) exit('Hacking Attempt');
 
-class M_salesquote extends CI_Model {
+class M_salesorder extends CI_Model {
 
     public function __construct() {
         parent::__construct();
@@ -20,7 +20,7 @@ class M_salesquote extends CI_Model {
              * 
              */
             $sql1 = "
-                select sales_quote_no, sales_quote_date, customer_id, keterangan, sales_quote_status
+                select sales_quote_no, sales_quote_date, customer_id, sales_quote_status
                 from sales_quote_head 
                 limit ".$input['start'].", ".$input['length'].";
             ";
@@ -75,7 +75,6 @@ class M_salesquote extends CI_Model {
             array_push($col_arr, "
                 <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editSalesQuote(".$implode.")'>Edit</a>
                 <a class='btn btn-default' role='button' onclick='deleteSalesQuote(".$implode.")'>Delete</a>
-                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#processModal' onclick='proceedSalesQuote(".$implode.")'>Process</a>
             ");
             
             array_push($result_arr, $col_arr);
@@ -226,8 +225,7 @@ class M_salesquote extends CI_Model {
     public function update_sales_quote($param) {
         $result = new \stdClass();
         // var_dump($param);exit;
-
-        $this->db->trans_start();
+        
         for($i=0;$i<count($param['salesQuoteLine']);$i++) {
             $data = array(
                 'sales_quote_no' => $param['salesQuoteNo'],
@@ -239,9 +237,11 @@ class M_salesquote extends CI_Model {
                 'updated_by' => $param['updatedBy']
             );
 
+            $this->db->trans_start();
             $this->db->where('sales_quote_no', $param['salesQuoteNo']);
             $this->db->where('item_id', $param['salesQuoteLine'][$i]['salesQuoteLineId']);
             $this->db->update('sales_quote_line', $data);
+            $this->db->trans_complete();
         }
 
         $log = array(
@@ -250,84 +250,7 @@ class M_salesquote extends CI_Model {
             'created_by' => $param['updatedBy']
         );
 
-        $this->db->insert('user_log', $log); 
-        $this->db->trans_complete();       
-
-        if ($this->db->trans_status() === FALSE) {
-            $this->db->trans_rollback();
-            $result->message = "Something went wrong";
-            // $result->error = $this->db->error();
-            $result->error = $this->db->_error_message();
-            return $result;
-        }
-        else {
-            $this->db->trans_commit();
-            $result->message = "Successfully update sale quote";
-            return $result;
-        }
-    }
-
-    public function proceed_sales_quote($param) {
-        $result = new \stdClass();
-        // var_dump($param);exit;
-
-        $sales_quote_head = array(
-            'sales_order_date' => date("Y-m-d H:i:s"),
-            'sales_quote_no' => $param['salesQuoteNo'],
-            'customer_address_id' => $param['custAddId'],
-            'customer_id' => $param['customerId'],
-            'sales_order_status' => 'OPEN',
-            'keterangan' => $param['keterangan'],
-            'created_at' => date("Y-m-d H:i:s"),
-            'created_by' => $param['updatedBy']
-        );
-
-        $this->db->trans_start();
-        $q1 = $this->db->insert('sales_order_head', $sales_quote_head);
-
-        $sales_quote_update = array(
-            'sales_quote_status' => 'ORDERED',
-            'updated_at' => date("Y-m-d H:i:s"),
-            'updated_by' => $param['updatedBy']
-        );
-
-        $this->db->where('sales_quote_no', $param['salesQuoteNo']);
-        $this->db->update('sales_quote_head', $sales_quote_update);
-
-        $q2 = "
-                select sales_order_no 
-                from sales_order_head 
-                order by sales_quote_no desc 
-                limit 0,1;
-            ";
-
-        $sales_order_no = $this->db->query($q2)->result_array()[0]['sales_order_no'];
-            // var_dump($sales_quote_no[0]['sales_quote_no']);
-        
-        for($i=0;$i<count($param['salesQuoteLine']);$i++) {
-            $data = array(
-                'sales_order_no' => $sales_order_no,
-                'item_id' => $param['salesQuoteLine'][$i]['salesQuoteLineId'],
-                'sales_order_qty' => $param['salesQuoteLine'][$i]['salesQuoteLineQty'],
-                'sales_order_price' => $param['salesQuoteLine'][$i]['salesQuoteLinePrice'],
-                'sales_order_line_status' => 'OPEN',
-                'keterangan' => $param['salesQuoteLine'][$i]['salesQuoteLineKet'],
-                'updated_at' => date("Y-m-d H:i:s"),
-                'created_by' => $param['updatedBy']
-            );
-        
-            $this->db->insert('sales_order_line', $data);
-            $this->db->trans_complete();
-        }
-
-        $log = array(
-            'tindakan' => $_SESSION['username'] . "SALES QUOTE NO " . $param['salesQuoteNo'] . " DIPROSES MENJADI SALES ORDER OLEH " . $_SESSION['username'],
-            'created_at' => date("Y-m-d H:i:s"),
-            'created_by' => $param['updatedBy']
-        );
-
-        $this->db->insert('user_log', $log); 
-        $this->db->trans_complete();       
+        $this->db->insert('user_log', $log);        
 
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();

@@ -149,4 +149,26 @@ class Salesquoteexec extends CI_Controller {
 
         exit;
     }
+
+    /*
+     * Function untuk update sales quote
+     * 
+     */
+    public function proceed_sales_quote() {
+        $data = $_POST;
+
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            $result = $this->m_salesquote->proceed_sales_quote($data);
+        }
+
+        $this->output
+        ->set_status_header(200)
+        ->set_content_type('application/json', 'utf-8')
+        ->set_output(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+        ->_display();
+
+        exit;
+    }
 }

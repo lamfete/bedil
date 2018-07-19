@@ -17,6 +17,8 @@ $(document).ready(function() {
 
     hideNotification();
 
+    $('#btnProceedSalesQuote').prop('disabled', true);
+
     // autoNumeric init
     $('#txtItemPrice').autoNumeric('init');
     var autoNumInput = $('#txtItemPrice').autoNumeric('init');
@@ -29,6 +31,7 @@ $(document).ready(function() {
     validation = [];
     cart = [];
     salesQuoteLine = [];
+    salesQuote = [];
     
     // Initialization end here
 
@@ -55,8 +58,8 @@ $(document).ready(function() {
             { "data": [1] },
             { "data": [2] },
             { "data": [3] },
-            { "data": [4] }
-            // { "data": [5] }
+            { "data": [4] },
+            { "data": [5] }
             // { "data": [6] }
             // { "data": [7] }
             // { "data": [8] },
@@ -70,6 +73,17 @@ $(document).ready(function() {
 
     $('#txtCustId').autocomplete({
         serviceUrl: '../customerexec/get_customer_id?type=autocomplete',
+        onSelect: function (suggestion) {
+            var itemId = suggestion.value.substring(0, 10);
+            // console.log(itemId);
+            
+            // function untuk mengisi harga sesuai dengan item_id yg dipilih
+            // getPriceItem(itemId);
+        }
+    });
+
+    $('#txtCustAddId').autocomplete({
+        serviceUrl: '../customerexec/get_customer_address_id?type=autocomplete',
         onSelect: function (suggestion) {
             var itemId = suggestion.value.substring(0, 10);
             // console.log(itemId);
@@ -95,150 +109,28 @@ function clearTxtCustId() {
     $('#txtItemId').val('');
 }
 
+function clearTxtCustAddId() {
+    $('#txtCustAddId').val('');
+}
+
 function clearTxtItemId() {
     $('#txtItemId').val('');
 }
 
 /*
- * get price of item
+ * Function enable tombol btnProceedSalesQuote
  * 
- * 
- */
-function getPriceItem(param) {
-    console.log(param);
-    $.ajax({
-        type: "POST",
-        url: "../itemexec/get_price_item",
-        data: {
-            itemId: param
-        },
-        success: function(data){
-            console.log(data);                       
-
-                // untuk edit modal
-            $('#txtItemPrice').val(data);
-            $('#txtItemPrice').focus();
-        },
-        error: function(data){
-            console.log('Error:', data);
-        }
-    });
-}
-
-/*
- * load type based on category
- * 
+ * Yang di cek adalah field: customer address
  * 
  */
-function getTypeItem(param) {
-    var categoryid = '';
-    
+function enableButtonProceedSalesQuote() {
 
-    if(param) {
-        // console.log("ADA ISINYA");
-        categoryid = param.category_id;
+    if($('#txtCustAddId').val() == '') {
+        $('#btnProceedSalesQuote').prop('disabled', true);
     }
     else {
-        // console.log("TIDAK ADA ISINYA");
-        categoryid = $('#DrdCategory').val();
+        $('#btnProceedSalesQuote').prop('disabled', false);
     }
-    
-    if(categoryid > 0) {
-        // console.log(categoryid);
-        $.ajax({
-            type: "POST",
-            url: "itemexec/get_type_item",
-            data: {
-                categoryId: categoryid
-            },
-            success: function(data){
-                // console.log(data);
-                var listType = "<option value='0'></option>";
-                // var listCategory = "";
-                
-                for(var i=0;i<data.length;i++)
-                {
-                    listType += '<option value=' + data[i].type_id + '>' + data[i].type_name + '</option>';
-                }
-                
-                if(param) {
-                    $('#DrdTypeEdit').html(listType);
-
-                    // untuk edit modal
-                    $('#DrdTypeEdit').val(param.type_id);
-                } else {
-                    $('#DrdType').html(listType);
-                }
-            },
-            error: function(data){
-                console.log('Error:', data);
-            }
-        });
-    } 
-}
-
-/*
- * load type based on category
- * 
- * 
- */
-function getBrandItem(param) {
-    var typeid = '';   
-
-    if(param) {
-        // console.log("ADA ISINYA");
-        typeid = param.type_id;
-    }
-    else {
-        // console.log("TIDAK ADA ISINYA");
-        typeid = $('#DrdType').val();
-    }
-
-    if(typeid > 0) {
-        // console.log(categoryId);
-        $.ajax({
-            type: "POST",
-            url: "itemexec/get_brand_item",
-            data: {
-                typeId: typeid
-            },
-            success: function(data){
-                // console.log(data);
-                var listBrand = "<option value='0'></option>";
-                // var listCategory = "";
-                
-                for(var i=0;i<data.length;i++)
-                {
-                    listBrand += '<option value=' + data[i].brand_id + '>' + data[i].brand_name + '</option>';
-                }
-                // $('#DrdBrand').html(listBrand);
-
-                if(param) {
-                    $('#DrdBrandEdit').html(listBrand);
-
-                    // untuk edit modal
-                    $('#DrdBrandEdit').val(param.brand_id);
-                } else {
-                    $('#DrdBrand').html(listBrand);
-                }
-            },
-            error: function(data){
-                console.log('Error:', data);
-            }
-        });
-    } 
-}
-
-/*
- * Function untuk mengosongkan semua textfield yang ada di form add item sale
- * 
- * 
- * 
- */
-function clearAddItemSaleTextfield() {
-    $('#txtItemId').val("");
-    $('#txtItemPrice').val("");
-    $('#txtItemQty').val("");    
 }
 
 /*
@@ -302,12 +194,6 @@ function editSalesQuote(value) {
                 content +="<td id='lblSubTotalEditLine"+ counter +"' style='line-height:2.6;'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
                 content +="<td><textarea id='txtItemKetLine"+ counter +"' class='form-control' onfocusout='editSalesQuoteLine("+counter+")'>" + data.data[i].keterangan + "</textarea></td>";
                 content +="<td align='center' style='line-height:2.6;'><button type='button' class='btnRemoveSalesQuoteLine btn btn-link'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td></tr>";
-
-                /* MASIH SALAH
-                if (salesQuoteLine.filter(e => e.salesQuoteLineId === data.data[i].item_id).length == 0) {
-                    salesQuoteLine.push(salesQuoteLine); 
-                }
-                */
             }
 
             $('#tableEditSalesQuote').append(content);
@@ -323,6 +209,129 @@ function editSalesQuote(value) {
             console.log('Error:', data);
         }
     });
+};
+
+/*
+ * function untuk mengisi modal process sales quote
+ * 
+ * 
+ * 
+ */
+function proceedSalesQuote(value) {
+    // console.log(value);
+    clearTxtCustAddId();
+    var salesQuoteNo = value[0];
+    var customerId = value[2];
+    var keterangan = value[3];
+    var userId = $('#userIdLogin').val();
+    console.log(salesQuoteNo);
+
+    $("#tableProcessSalesQuote tbody tr").remove(); 
+
+    $("#lblProcessSalesQuoteNo").text("Process Sales Quote " + salesQuoteNo);
+    
+    $.ajax({
+        type: "POST",
+        url: "../salesquoteexec/get_sales_quote_line",
+        data: {
+            salesQuoteNo: salesQuoteNo
+        },
+        success: function(data){
+            // console.log(data.data[0].brand_id);
+
+            var content_process = '';
+
+            for(var i=0;i<data.data.length;i++) {
+                var counter = i+1;                
+                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+
+                // 2. memasukkan sales quote line ke dalam bentuk array (untuk simpan data)
+                // init object
+                var salesQuoteLineitem = {
+                    salesQuoteLineId: data.data[i].item_id,
+                    salesQuoteLinePrice: data.data[i].sales_quote_price,
+                    salesQuoteLineQty: data.data[i].sales_quote_qty,
+                    salesQuoteLineKet: data.data[i].keterangan
+                };
+                salesQuoteLine.push(salesQuoteLineitem);
+            }
+
+            salesQuote = {
+                salesQuoteNo: salesQuoteNo,
+                customerId: customerId,
+                keterangan: keterangan,
+                salesQuoteLine: salesQuoteLine,
+                userId: userId
+            }
+            
+            // console.log(salesQuoteLine);
+            
+            for(var i=0;i<data.data.length;i++) {
+                var counter = i+1;                
+                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+
+                // 1. memasukkan sales quote line ke dalam bentuk html (untuk tampilan)
+                content_process +="<tr><td style='line-height:2.6;' id='lblIdItemProcessLine"+ counter +"'>" + counter + "</td>";
+                content_process +="<td style='line-height:2.6;' class='salesQuoteForRemove'  id='lblItemIdProcessLine"+ counter +"'>" + data.data[i].item_id + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemNameProcessLine"+ counter +"'>" + data.data[i].item_name + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].sales_quote_qty + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].sales_quote_price, "Rp. ", 2, ".", ",") + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblSubTotalEditLine"+ counter +"' align='right'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemKeteranganProcessLine"+ counter +"'>" + data.data[i].keterangan + "</td>";
+            }
+
+            $('#tableProcessSalesQuote').append(content_process);
+            // end here
+        },
+        error: function(data){
+            console.log('Error:', data);
+        }
+    });
+};
+
+/*
+ * Function untuk memproses SQ menjadi SO
+ * 
+ */
+function proceedSqToSo() {
+    var salesQuoteNo = $("#lblProcessSalesQuoteNo").text().substring(20, 30);
+    var custAddId = $("#txtCustAddId").val().substring(0, 10);
+    // var customerId = salesQuoteLine[0].customerId;
+    var customerId = salesQuote.customerId;
+    var keterangan = salesQuote.keterangan;
+
+    // var custAddId = $('#txtCustAddId').val();
+    // console.log($("#lblSalesQuoteNo").text().substring(20, 30));
+    // console.log(salesQuoteLine);
+    // console.log(customerId);
+    // console.log(custAddId);
+
+    var updateRecord = confirm("Yakin Sales Quote " + salesQuoteNo + " diproses menjadi Sales Order?");
+
+    if(updateRecord == true) {
+        $.ajax({
+            type: "POST",
+            url: "../salesquoteexec/proceed_sales_quote",
+            data: {
+                salesQuoteNo: salesQuoteNo,
+                customerId: customerId,
+                custAddId: custAddId,
+                keterangan: keterangan,
+                salesQuoteLine: salesQuoteLine,
+                updatedBy: $('#userIdLogin').val()
+            },
+            success: function(resp) {
+                // alert("BERHASIL UPDATE USER");
+                alert(resp.message);
+                // window.location.href = '../salesquote/manage';
+            },
+            error: function(resp) {
+                // alert("something went wrong");
+                alert('Error: ', resp.message);
+                // window.location.href = '../salesquote/manage';
+            }
+        });
+    }
 };
 
 /*
@@ -389,12 +398,12 @@ function updateSalesQuote() {
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                // window.location.href = '/item';
+                window.location.href = '../salesquote/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                // window.location.href = '/item';
+                window.location.href = '../salesquote/manage';
             }
         });
     }

@@ -84,6 +84,34 @@ class Customerexec extends CI_Controller {
     }
 
     /*
+     * Function untuk keperluan autocomplete jquery
+     * 
+     * 
+     * 
+     */
+    public function get_customer_address_id() {
+        // $data['all_user'] = new \stdClass();
+        $type = $_GET['type'];
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            if($type == 'autocomplete') {
+                $data['all_customer'] = $this->m_customer->get_customer_address_id("autocomplete", $_GET['query']);
+            }
+            // var_dump($data['all_user']);exit;
+            // echo json_encode($data['all_user']);
+
+            $this->output
+            ->set_status_header(200)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($data['all_customer'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+            ->_display();
+
+            exit;
+        }
+    }
+
+    /*
      * Function untuk mendapatkan isi dari table category
      * 
      */

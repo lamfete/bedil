@@ -128,7 +128,7 @@
     <div class="col-xs-12">
         <button type="button" class="btn btn-lg" onclick="createNewSalesQuote()">
             <span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span>
-            Process
+            Proceed
         </button>
     <!-- </div>
     <div class="col-xs-12"> -->

@@ -88,6 +88,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Transaction<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                         <li><a href="/salesquote/manage">Sales Quote</a></li>
+                        <li><a href="/salesorder/manage">Sales Order</a></li>
                         <li><a href="/purchase/add">Purchase</a></li>
                         <li><a href="/adjust">Adjustment</a></li>
                         <li role="separator" class="divider"></li>
