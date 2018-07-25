@@ -42,7 +42,7 @@ class M_salesquote extends CI_Model {
             $num_rows = count($q2->result());
         } elseif($type=="search") {
             $sql1 = "
-                select sales_quote_no, sales_quote_date, customer_id, sales_quote_status
+            select sales_quote_no, sales_quote_date, customer_id, keterangan, sales_quote_status
                 from sales_quote_head 
                 where sales_quote_no like '%".$input['search']."%'
                 or sales_quote_date like '%".$input['search']."%'
@@ -312,7 +312,7 @@ class M_salesquote extends CI_Model {
                 'sales_order_price' => $param['salesQuoteLine'][$i]['salesQuoteLinePrice'],
                 'sales_order_line_status' => 'OPEN',
                 'keterangan' => $param['salesQuoteLine'][$i]['salesQuoteLineKet'],
-                'updated_at' => date("Y-m-d H:i:s"),
+                'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['updatedBy']
             );
         
@@ -321,7 +321,7 @@ class M_salesquote extends CI_Model {
         }
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . "SALES QUOTE NO " . $param['salesQuoteNo'] . " DIPROSES MENJADI SALES ORDER OLEH " . $_SESSION['username'],
+            'tindakan' => $_SESSION['username'] . " MEMPROSES SALES QUOTE NO " . $param['salesQuoteNo'] . " MENJADI SALES ORDER.",
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
@@ -338,7 +338,7 @@ class M_salesquote extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update sale quote";
+            $result->message = "Successfully proceed sale quote";
             return $result;
         }
     }

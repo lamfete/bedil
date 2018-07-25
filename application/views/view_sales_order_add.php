@@ -1,4 +1,4 @@
-<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/backoffice/sales_quote.js"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/backoffice/sales_order.js"></script>
 
 <div class="row">
     <div class="col-xs-12">

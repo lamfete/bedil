@@ -61,6 +61,7 @@ class M_customer extends CI_Model {
                 select concat(customer_address_id, ' - ', customer_address_name) as customer_address_id
                 from customer_address
                 where customer_id like '%".$input."%'
+                or customer_address_id like '%".$input."%'
                 or customer_address_name like '%".$input."%';
             ";
 

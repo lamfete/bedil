@@ -7,7 +7,7 @@ class M_salesorder extends CI_Model {
         parent::__construct();
     }
 
-    public function get_all_sales_quote($type, $input) {
+    public function get_all_sales_order($type, $input) {
         $result = new stdClass();
         $result_arr = array();
 
@@ -20,8 +20,8 @@ class M_salesorder extends CI_Model {
              * 
              */
             $sql1 = "
-                select sales_quote_no, sales_quote_date, customer_id, sales_quote_status
-                from sales_quote_head 
+                select sales_order_no, sales_order_date, customer_id, customer_address_id, keterangan, sales_order_status
+                from sales_order_head 
                 limit ".$input['start'].", ".$input['length'].";
             ";
             
@@ -30,7 +30,7 @@ class M_salesorder extends CI_Model {
              * 
              */
             $sql2 = "
-                select * from sales_quote_head;
+                select * from sales_order_head;
             ";
 
             $q1 = $this->db->query($sql1);
@@ -42,12 +42,12 @@ class M_salesorder extends CI_Model {
             $num_rows = count($q2->result());
         } elseif($type=="search") {
             $sql1 = "
-                select sales_quote_no, sales_quote_date, customer_id, sales_quote_status
-                from sales_quote_head 
-                where sales_quote_no like '%".$input['search']."%'
-                or sales_quote_date like '%".$input['search']."%'
+            select sales_order_no, sales_order_date, customer_id, customer_address_id, keterangan, sales_order_status
+                from sales_order_head 
+                where sales_order_no like '%".$input['search']."%'
+                or sales_order_date like '%".$input['search']."%'
                 or customer_id like '%".$input['search']."%'
-                or sales_quote_status like '%".$input['search']."%'
+                or sales_order_status like '%".$input['search']."%'
                 limit ".$input['start'].", ".$input['length'].";
             ";
 
@@ -73,8 +73,9 @@ class M_salesorder extends CI_Model {
             }
             $implode = json_encode($col_arr);
             array_push($col_arr, "
-                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editSalesQuote(".$implode.")'>Edit</a>
-                <a class='btn btn-default' role='button' onclick='deleteSalesQuote(".$implode.")'>Delete</a>
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editSalesOrder(".$implode.")'>Edit</a>
+                <a class='btn btn-default' role='button' onclick='deleteSalesOrder(".$implode.")'>Delete</a>
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#processModal' onclick='proceedSalesOrder(".$implode.")'>Process</a>
             ");
             
             array_push($result_arr, $col_arr);
@@ -85,21 +86,21 @@ class M_salesorder extends CI_Model {
         return $result;
     }
 
-    public function get_sales_quote_line($type, $param) {
+    public function get_sales_order_line($type, $param) {
         $result = new \stdClass();
         
-        if($type == 'salesquoteline') {
-            $this->db->select('sales_quote_line.sales_quote_no, sales_quote_line.item_id, item.item_name, sales_quote_line.sales_quote_qty, sales_quote_line.sales_quote_price, sales_quote_line.keterangan');
-            $this->db->from('sales_quote_line');
-            $this->db->join('item', 'sales_quote_line.item_id = item.item_id');
-            $this->db->where('sales_quote_no', $param);
+        if($type == 'salesorderline') {
+            $this->db->select('sales_order_line.sales_order_no, sales_order_line.item_id, item.item_name, sales_order_line.sales_order_qty, sales_order_line.sales_order_price, sales_order_line.keterangan');
+            $this->db->from('sales_order_line');
+            $this->db->join('item', 'sales_order_line.item_id = item.item_id');
+            $this->db->where('sales_order_no', $param);
         } 
 
         $query = $this->db->get();
         $num_rows = $query->num_rows();
 
         if($num_rows > 0) {
-            $result->sales_quote_no = $query->result_array()[0]['sales_quote_no'];
+            $result->sales_order_no = $query->result_array()[0]['sales_order_no'];
             $result->count = $num_rows;
         } else {
             $result->message = "Free to go";
@@ -193,18 +194,18 @@ class M_salesorder extends CI_Model {
         
     }
 
-    public function delete_sales_quote($param) {
+    public function delete_sales_order($param) {
         $result = new \stdClass();
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " DELETE SALES QUOTE NO. " . $param['salesQuoteNo'],
+            'tindakan' => $_SESSION['username'] . " DELETE SALES ORDER NO. " . $param['salesOrderNo'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
 
         $this->db->trans_start();
-        $this->db->delete('sales_quote_line', array('sales_quote_no' => $param['salesQuoteNo']));
-        $this->db->delete('sales_quote_head', array('sales_quote_no' => $param['salesQuoteNo']));
+        $this->db->delete('sales_order_line', array('sales_order_no' => $param['salesOrderNo']));
+        $this->db->delete('sales_order_head', array('sales_order_no' => $param['salesOrderNo']));
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -217,40 +218,40 @@ class M_salesorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully delete sales quote";
+            $result->message = "Successfully delete sales order";
             return $result;
         }
     }
 
-    public function update_sales_quote($param) {
+    public function update_sales_order($param) {
         $result = new \stdClass();
         // var_dump($param);exit;
-        
-        for($i=0;$i<count($param['salesQuoteLine']);$i++) {
+
+        $this->db->trans_start();
+        for($i=0;$i<count($param['salesOrderLine']);$i++) {
             $data = array(
-                'sales_quote_no' => $param['salesQuoteNo'],
-                'item_id' => $param['salesQuoteLine'][$i]['salesQuoteLineId'],
-                'sales_quote_qty' => $param['salesQuoteLine'][$i]['salesQuoteLineQty'],
-                'sales_quote_price' => $param['salesQuoteLine'][$i]['salesQuoteLinePrice'],
-                'keterangan' => $param['salesQuoteLine'][$i]['salesQuoteLineKet'],
+                'sales_order_no' => $param['salesOrderNo'],
+                'item_id' => $param['salesOrderLine'][$i]['salesOrderLineId'],
+                'sales_order_qty' => $param['salesOrderLine'][$i]['salesOrderLineQty'],
+                'sales_order_price' => $param['salesOrderLine'][$i]['salesOrderLinePrice'],
+                'keterangan' => $param['salesOrderLine'][$i]['salesOrderLineKet'],
                 'updated_at' => date("Y-m-d H:i:s"),
                 'updated_by' => $param['updatedBy']
             );
 
-            $this->db->trans_start();
-            $this->db->where('sales_quote_no', $param['salesQuoteNo']);
-            $this->db->where('item_id', $param['salesQuoteLine'][$i]['salesQuoteLineId']);
-            $this->db->update('sales_quote_line', $data);
-            $this->db->trans_complete();
+            $this->db->where('sales_order_no', $param['salesOrderNo']);
+            $this->db->where('item_id', $param['salesOrderLine'][$i]['salesOrderLineId']);
+            $this->db->update('sales_order_line', $data);
         }
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " UPDATE SALES QUOTE NO " . $param['salesQuoteNo'],
+            'tindakan' => $_SESSION['username'] . " UPDATE SALES ORDER NO " . $param['salesOrderNo'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
 
-        $this->db->insert('user_log', $log);        
+        $this->db->insert('user_log', $log); 
+        $this->db->trans_complete();       
 
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
@@ -261,7 +262,83 @@ class M_salesorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update sale quote";
+            $result->message = "Successfully update sale order";
+            return $result;
+        }
+    }
+
+    public function proceed_sales_order($param) {
+        $result = new \stdClass();
+        // var_dump($param);exit;
+
+        $sales_order_head = array(
+            'sales_shipper_date' => date("Y-m-d H:i:s"),
+            'sales_order_no' => $param['salesOrderNo'],
+            'customer_address_id' => $param['custAddId'],
+            'customer_id' => $param['customerId'],
+            'sales_shipper_status' => 'OPEN',
+            'keterangan' => $param['keterangan'],
+            'created_at' => date("Y-m-d H:i:s"),
+            'created_by' => $param['updatedBy']
+        );
+
+        $this->db->trans_start();
+        $q1 = $this->db->insert('sales_shipper_head', $sales_order_head);
+
+        $sales_order_update = array(
+            'sales_order_status' => 'SHIPPED',
+            'updated_at' => date("Y-m-d H:i:s"),
+            'updated_by' => $param['updatedBy']
+        );
+
+        $this->db->where('sales_order_no', $param['salesOrderNo']);
+        $this->db->update('sales_order_head', $sales_order_update);
+
+        $q2 = "
+                select sales_shipper_no 
+                from sales_shipper_head 
+                order by sales_shipper_no desc 
+                limit 0,1;
+            ";
+
+        $sales_shipper_no = $this->db->query($q2)->result_array()[0]['sales_shipper_no'];
+            // var_dump($sales_quote_no[0]['sales_quote_no']);
+        
+        for($i=0;$i<count($param['salesOrderLine']);$i++) {
+            $data = array(
+                'sales_shipper_no' => $sales_shipper_no,
+                'item_id' => $param['salesOrderLine'][$i]['salesOrderLineId'],
+                'sales_shipper_qty' => $param['salesOrderLine'][$i]['salesOrderLineQty'],
+                'sales_shipper_price' => $param['salesOrderLine'][$i]['salesOrderLinePrice'],
+                'sales_shipper_line_status' => 'OPEN',
+                'keterangan' => $param['salesOrderLine'][$i]['salesOrderLineKet'],
+                'created_at' => date("Y-m-d H:i:s"),
+                'created_by' => $param['updatedBy']
+            );
+        
+            $this->db->insert('sales_shipper_line', $data);
+            $this->db->trans_complete();
+        }
+
+        $log = array(
+            'tindakan' => $_SESSION['username'] . " MEMPROSES SALES ORDER NO " . $param['salesOrderNo'] . " MENJADI SALES SHIPPER.",
+            'created_at' => date("Y-m-d H:i:s"),
+            'created_by' => $param['updatedBy']
+        );
+
+        $this->db->insert('user_log', $log); 
+        $this->db->trans_complete();       
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $result->message = "Something went wrong";
+            // $result->error = $this->db->error();
+            $result->error = $this->db->_error_message();
+            return $result;
+        }
+        else {
+            $this->db->trans_commit();
+            $result->message = "Successfully proceed sale order";
             return $result;
         }
     }

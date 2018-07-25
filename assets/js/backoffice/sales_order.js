@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     hideNotification();
 
-    $('#btnProceedSalesQuote').prop('disabled', true);
+    $('#btnProceedSalesOrder').prop('disabled', true);
 
     // autoNumeric init
     $('#txtItemPrice').autoNumeric('init');
@@ -30,12 +30,12 @@ $(document).ready(function() {
     // array untuk mengecek apakah semua field mandatory sudah diisi semua atau belum
     validation = [];
     cart = [];
-    salesQuoteLine = [];
-    salesQuote = [];
+    salesOrderLine = [];
+    salesOrder = [];
     
     // Initialization end here
 
-    $('#tableSalesQuote').DataTable({
+    $('#tableSalesOrder').DataTable({
         "processing": true,
         "serverSide": true,
         "paging": true,
@@ -44,7 +44,7 @@ $(document).ready(function() {
         "bAutowidth": false,
         "ajax": {
             //url: '<?php echo base_url('userexec/get_user'); ?>',
-            url: '../salesquoteexec/get_sales_quote?type=datatables',
+            url: '../salesorderexec/get_sales_order?type=datatables',
             type: 'POST'
         },
         "columns": [
@@ -59,8 +59,8 @@ $(document).ready(function() {
             { "data": [2] },
             { "data": [3] },
             { "data": [4] },
-            { "data": [5] }
-            // { "data": [6] }
+            { "data": [5] },
+            { "data": [6] }
             // { "data": [7] }
             // { "data": [8] },
             // { "data": [9] },
@@ -123,13 +123,13 @@ function clearTxtItemId() {
  * Yang di cek adalah field: customer address
  * 
  */
-function enableButtonProceedSalesQuote() {
+function enableButtonProceedSalesOrder() {
 
     if($('#txtCustAddId').val() == '') {
-        $('#btnProceedSalesQuote').prop('disabled', true);
+        $('#btnProceedSalesOrder').prop('disabled', true);
     }
     else {
-        $('#btnProceedSalesQuote').prop('disabled', false);
+        $('#btnProceedSalesOrder').prop('disabled', false);
     }
 }
 
@@ -139,21 +139,21 @@ function enableButtonProceedSalesQuote() {
  * 
  * 
  */
-function editSalesQuote(value) {
+function editSalesOrder(value) {
     // console.log(value);
-    salesQuoteLine = [];
-    $("#tableEditSalesQuote tbody tr").remove(); 
+    // salesOrderLine = [];
+    $("#tableEditSalesOrder tbody tr").remove(); 
     // console.log(salesQuoteLine); // output: []
     
-    var salesQuoteNo = value[0];
-    // console.log(salesQuoteNo);
-    $("#lblSalesQuoteNo").text("Edit Sales Quote " + salesQuoteNo);
+    var salesOrderNo = value[0];
+    console.log(salesOrderNo);
+    $("#lblSalesOrderNo").text("Proceed Sales Order " + salesOrderNo);
     
     $.ajax({
         type: "POST",
-        url: "../salesquoteexec/get_sales_quote_line",
+        url: "../salesorderexec/get_sales_order_line",
         data: {
-            salesQuoteNo: salesQuoteNo
+            salesOrderNo: salesOrderNo
         },
         success: function(data){
             // console.log(data.data[0].brand_id);
@@ -166,37 +166,37 @@ function editSalesQuote(value) {
 
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+                var subTotal = data.data[i].sales_order_qty * data.data[i].sales_order_price;
 
                 // 2. memasukkan sales quote line ke dalam bentuk array (untuk simpan data)
                 // init object
-                var salesQuoteLineitem = {
-                    salesQuoteLineId: data.data[i].item_id,
-                    salesQuoteLinePrice: data.data[i].sales_quote_price,
-                    salesQuoteLineQty: data.data[i].sales_quote_qty,
-                    salesQuoteLineKet: data.data[i].keterangan
+                var salesOrderLineitem = {
+                    salesOrderLineId: data.data[i].item_id,
+                    salesOrderLinePrice: data.data[i].sales_order_price,
+                    salesOrderLineQty: data.data[i].sales_order_qty,
+                    salesOrderLineKet: data.data[i].keterangan
                 };
-                salesQuoteLine.push(salesQuoteLineitem);
+                salesOrderLine.push(salesOrderLineitem);
             }
             
-            console.log(salesQuoteLine);
+            console.log(salesOrderLine);
             
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+                var subTotal = data.data[i].sales_order_qty * data.data[i].sales_order_price;
 
                 // 1. memasukkan sales quote line ke dalam bentuk html (untuk tampilan)
                 content +="<tr><td style='line-height:2.6;' id='lblIdItemEditLine"+ counter +"'>" + counter + "</td>";
-                content +="<td style='line-height:2.6;' class='salesQuoteForRemove'  id='lblItemIdEditLine"+ counter +"'>" + data.data[i].item_id + "</td>";
+                content +="<td style='line-height:2.6;' class='salesOrderForRemove'  id='lblItemIdEditLine"+ counter +"'>" + data.data[i].item_id + "</td>";
                 content +="<td style='line-height:2.6;' id='lblItemNameEditLine"+ counter +"'>" + data.data[i].item_name + "</td>";
-                content +="<td><input type='text' id='txtItemQtyEditLine"+ counter +"' class='form-control' value='" + data.data[i].sales_quote_qty + "' onfocusout='editSalesQuoteLine("+counter+")'/></td>";
-                content +="<td><input type='text' id='txtItemPriceEditLine"+ counter +"' class='form-control' value='" + accounting.formatMoney(data.data[i].sales_quote_price, "Rp. ", 2, ".", ",") + "' data-a-sign='Rp. ' data-a-dec=',' data-a-sep='.' onfocusout='editSalesQuoteLine("+counter+")'/></td>";
+                content +="<td><input type='text' id='txtItemQtyEditLine"+ counter +"' class='form-control' value='" + data.data[i].sales_order_qty + "' onfocusout='editSalesOrderLine("+counter+")'/></td>";
+                content +="<td><input type='text' id='txtItemPriceEditLine"+ counter +"' class='form-control' value='" + accounting.formatMoney(data.data[i].sales_order_price, "Rp. ", 2, ".", ",") + "' data-a-sign='Rp. ' data-a-dec=',' data-a-sep='.' onfocusout='editSalesOrderLine("+counter+")'/></td>";
                 content +="<td id='lblSubTotalEditLine"+ counter +"' style='line-height:2.6;'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
-                content +="<td><textarea id='txtItemKetLine"+ counter +"' class='form-control' onfocusout='editSalesQuoteLine("+counter+")'>" + data.data[i].keterangan + "</textarea></td>";
-                content +="<td align='center' style='line-height:2.6;'><button type='button' class='btnRemoveSalesQuoteLine btn btn-link'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td></tr>";
+                content +="<td><textarea id='txtItemKetLine"+ counter +"' class='form-control' onfocusout='editSalesOrderLine("+counter+")'>" + data.data[i].keterangan + "</textarea></td>";
+                content +="<td align='center' style='line-height:2.6;'><button type='button' class='btnRemoveSalesOrderLine btn btn-link'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td></tr>";
             }
 
-            $('#tableEditSalesQuote').append(content);
+            $('#tableEditSalesOrder').append(content);
 
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;
@@ -212,75 +212,93 @@ function editSalesQuote(value) {
 };
 
 /*
- * function untuk mengisi modal process sales quote
+ * function untuk mengisi modal process sales order
  * 
  * 
  * 
  */
-function proceedSalesQuote(value) {
+function proceedSalesOrder(value) {
     // console.log(value);
     clearTxtCustAddId();
-    var salesQuoteNo = value[0];
+    var salesOrderNo = value[0];
     var customerId = value[2];
-    var keterangan = value[3];
+    var customerAddId = value[3];
+    var keterangan = value[4];
     var userId = $('#userIdLogin').val();
-    console.log(salesQuoteNo);
+    console.log(salesOrderNo);
 
-    $("#tableProcessSalesQuote tbody tr").remove(); 
+    $("#tableProcessSalesOrder tbody tr").remove(); 
 
-    $("#lblProcessSalesQuoteNo").text("Process Sales Quote " + salesQuoteNo);
+    $("#lblProcessSalesOrderNo").text("Process Sales Order " + salesOrderNo);
+    // $('#txtCustAddId').val(customerAddId);
+
+    $.ajax({
+        type: "POST",
+        url: "../customerexec/get_customer_address_id?type=modal&query=" + customerAddId,
+        data: {
+            customerAddId: customerAddId
+        },
+        success: function(data){
+            $('#txtCustAddId').val(data.suggestions);
+            // console.log(data.suggestions);
+            enableButtonProceedSalesOrder();
+        },
+        error: function(data){
+            console.log('Error:', data);
+        }
+    });
     
     $.ajax({
         type: "POST",
-        url: "../salesquoteexec/get_sales_quote_line",
+        url: "../salesorderexec/get_sales_order_line",
         data: {
-            salesQuoteNo: salesQuoteNo
+            salesOrderNo: salesOrderNo
         },
         success: function(data){
-            // console.log(data.data[0].brand_id);
+            // console.log(data);
 
             var content_process = '';
 
-            for(var i=0;i<data.data.length;i++) {
+            for(var i=0;i<data.count;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+                var subTotal = data.data[i].sales_order_qty * data.data[i].sales_order_price;
 
-                // 2. memasukkan sales quote line ke dalam bentuk array (untuk simpan data)
+                // 2. memasukkan sales order line ke dalam bentuk array (untuk simpan data)
                 // init object
-                var salesQuoteLineitem = {
-                    salesQuoteLineId: data.data[i].item_id,
-                    salesQuoteLinePrice: data.data[i].sales_quote_price,
-                    salesQuoteLineQty: data.data[i].sales_quote_qty,
-                    salesQuoteLineKet: data.data[i].keterangan
+                var salesOrderLineitem = {
+                    salesOrderLineId: data.data[i].item_id,
+                    salesOrderLinePrice: data.data[i].sales_order_price,
+                    salesOrderLineQty: data.data[i].sales_order_qty,
+                    salesOrderLineKet: data.data[i].keterangan
                 };
-                salesQuoteLine.push(salesQuoteLineitem);
+                salesOrderLine.push(salesOrderLineitem);
             }
 
-            salesQuote = {
-                salesQuoteNo: salesQuoteNo,
+            salesOrder = {
+                salesOrderNo: salesOrderNo,
                 customerId: customerId,
                 keterangan: keterangan,
-                salesQuoteLine: salesQuoteLine,
+                salesOrderLine: salesOrderLine,
                 userId: userId
             }
             
             // console.log(salesQuoteLine);
             
-            for(var i=0;i<data.data.length;i++) {
+            for(var i=0;i<data.count;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+                var subTotal = data.data[i].sales_order_qty * data.data[i].sales_order_price;
 
                 // 1. memasukkan sales quote line ke dalam bentuk html (untuk tampilan)
                 content_process +="<tr><td style='line-height:2.6;' id='lblIdItemProcessLine"+ counter +"'>" + counter + "</td>";
-                content_process +="<td style='line-height:2.6;' class='salesQuoteForRemove'  id='lblItemIdProcessLine"+ counter +"'>" + data.data[i].item_id + "</td>";
+                content_process +="<td style='line-height:2.6;' class='salesOrderForRemove'  id='lblItemIdProcessLine"+ counter +"'>" + data.data[i].item_id + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemNameProcessLine"+ counter +"'>" + data.data[i].item_name + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].sales_quote_qty + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].sales_quote_price, "Rp. ", 2, ".", ",") + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].sales_order_qty + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].sales_order_price, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblSubTotalEditLine"+ counter +"' align='right'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemKeteranganProcessLine"+ counter +"'>" + data.data[i].keterangan + "</td>";
             }
 
-            $('#tableProcessSalesQuote').append(content_process);
+            $('#tableProcessSalesOrder').append(content_process);
             // end here
         },
         error: function(data){
@@ -290,15 +308,15 @@ function proceedSalesQuote(value) {
 };
 
 /*
- * Function untuk memproses SQ menjadi SO
+ * Function untuk memproses SO menjadi Shipper
  * 
  */
-function proceedSqToSo() {
-    var salesQuoteNo = $("#lblProcessSalesQuoteNo").text().substring(20, 30);
+function proceedSoToShipper() {
+    var salesOrderNo = $("#lblProcessSalesOrderNo").text().substring(20, 30);
     var custAddId = $("#txtCustAddId").val().substring(0, 10);
     // var customerId = salesQuoteLine[0].customerId;
-    var customerId = salesQuote.customerId;
-    var keterangan = salesQuote.keterangan;
+    var customerId = salesOrder.customerId;
+    var keterangan = salesOrder.keterangan;
 
     // var custAddId = $('#txtCustAddId').val();
     // console.log($("#lblSalesQuoteNo").text().substring(20, 30));
@@ -306,29 +324,29 @@ function proceedSqToSo() {
     // console.log(customerId);
     // console.log(custAddId);
 
-    var updateRecord = confirm("Yakin Sales Quote " + salesQuoteNo + " diproses menjadi Sales Order?");
+    var updateRecord = confirm("Yakin Sales Order " + salesOrderNo + " diproses menjadi Sales Shipper?");
 
     if(updateRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../salesquoteexec/proceed_sales_quote",
+            url: "../salesorderexec/proceed_sales_order",
             data: {
-                salesQuoteNo: salesQuoteNo,
+                salesOrderNo: salesOrderNo,
                 customerId: customerId,
                 custAddId: custAddId,
                 keterangan: keterangan,
-                salesQuoteLine: salesQuoteLine,
+                salesOrderLine: salesOrderLine,
                 updatedBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                // window.location.href = '../salesquote/manage';
+                window.location.href = '../salesorder/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                // window.location.href = '../salesquote/manage';
+                window.location.href = '../salesorder/manage';
             }
         });
     }
@@ -339,71 +357,71 @@ function proceedSqToSo() {
  * 
  * 
  */
-$(document).on('click', 'button.btnRemoveSalesQuoteLine', function () {
-    var itemId = $(this).closest('tr').find('.salesQuoteForRemove').text();
+$(document).on('click', 'button.btnRemoveSalesOrderLine', function () {
+    var itemId = $(this).closest('tr').find('.salesOrderForRemove').text();
     // console.log(itemId);
-    removeSalesQuoteLine(itemId);
+    removeSalesOrderLine(itemId);
      
     $(this).closest('tr').remove();
     return false;
 });
 
 /*
- * function untuk delete sales quote
+ * function untuk delete sales order
  * 
  * 
  */
-function deleteSalesQuote(value) {
+function deleteSalesOrder(value) {
     // console.log(value);
 
-    var deleteRecord = confirm("Yakin hapus data sales quote " + value[0] + " dari database?");
+    var deleteRecord = confirm("Yakin hapus data sales order " + value[0] + " dari database?");
 
     if(deleteRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../salesquoteexec/delete_sales_quote",
+            url: "../salesorderexec/delete_sales_order",
             data: {
-                salesQuoteNo: value[0],
-                salesQuoteCust: value[2],
+                salesOrderNo: value[0],
+                salesOrderCust: value[2],
                 createdBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL DELETE USER");
                 alert(resp.message);
-                window.location.href = '/salesquote/manage';
+                window.location.href = '/salesorder/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '/salesquote/manage';
+                window.location.href = '/salesorder/manage';
             }
         });
     }
 };
 
-function updateSalesQuote() {
-    var salesQuoteNo = $("#lblSalesQuoteNo").text().substring(17, 27);
+function updateSalesOrder() {
+    var salesOrderNo = $("#lblSalesOrderNo").text().substring(20, 30);
     // console.log($("#lblSalesQuoteNo").text().substring(17, 27));
-    var updateRecord = confirm("Yakin update data Sales Quote " + salesQuoteNo + "?");
+    var updateRecord = confirm("Yakin update data Sales Order " + salesOrderNo + "?");
 
     if(updateRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../salesquoteexec/update_sales_quote",
+            url: "../salesorderexec/update_sales_order",
             data: {
-                salesQuoteNo: salesQuoteNo,
-                salesQuoteLine: salesQuoteLine,
+                salesOrderNo: salesOrderNo,
+                salesOrderLine: salesOrderLine,
                 updatedBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                window.location.href = '../salesquote/manage';
+                window.location.href = '../salesorder/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '../salesquote/manage';
+                window.location.href = '../salesorder/manage';
             }
         });
     }
@@ -470,36 +488,36 @@ $(document).on('click', 'button.btnRemove', function () {
     return false;
 });
 
-function editSalesQuoteLine(paramIdItemTable) {
-    hitungSubTotalSalesQuoteLine(paramIdItemTable);
+function editSalesOrderLine(paramIdItemTable) {
+    hitungSubTotalSalesOrderLine(paramIdItemTable);
     // console.log(cart[paramIdItemTable - 1].itemLineId);
     // console.log($('#lblItemIdLine' + paramIdItemTable).text());
     // console.log(salesQuoteLine);
-    if (salesQuoteLine.filter(e => e.salesQuoteLineId === $('#lblItemIdEditLine' + paramIdItemTable).text()).length > -1) {
+    if (salesOrderLine.filter(e => e.salesOrderLineId === $('#lblItemIdEditLine' + paramIdItemTable).text()).length > -1) {
         // console.log("BARANG SUDAH ADA");
-        var index = salesQuoteLine.findIndex(x => x.salesQuoteLineId == $('#lblItemIdEditLine' + paramIdItemTable).text());
+        var index = salesOrderLine.findIndex(x => x.salesOrderLineId == $('#lblItemIdEditLine' + paramIdItemTable).text());
         // console.log(index);
         
         if(index > -1) {
             // remove element yg lama
-            salesQuoteLine.splice(index, 1);
+            salesOrderLine.splice(index, 1);
 
             // tambahkan itemLine yg sudah di edit ke dalam array
-            salesQuoteItemId = $('#lblItemIdEditLine' + paramIdItemTable).text();
-            salesQuoteItemPrice = $('#txtItemPriceEditLine'  + paramIdItemTable).autoNumeric('get');
-            salesQuoteItemQty = $('#txtItemQtyEditLine' + paramIdItemTable).val();
-            salesQuoteItemKet = $('#txtItemKetLine' + paramIdItemTable).val();
+            salesOrderItemId = $('#lblItemIdEditLine' + paramIdItemTable).text();
+            salesOrderItemPrice = $('#txtItemPriceEditLine'  + paramIdItemTable).autoNumeric('get');
+            salesOrderItemQty = $('#txtItemQtyEditLine' + paramIdItemTable).val();
+            salesOrderItemKet = $('#txtItemKetLine' + paramIdItemTable).val();
 
             // init object
-            var salesQuoteItemLine = {
-                salesQuoteLineId: salesQuoteItemId,
-                salesQuoteLinePrice: salesQuoteItemPrice,
-                salesQuoteLineQty: salesQuoteItemQty,
-                salesQuoteLineKet: salesQuoteItemKet
+            var salesOrderItemLine = {
+                salesOrderLineId: salesOrderItemId,
+                salesOrderLinePrice: salesOrderItemPrice,
+                salesOrderLineQty: salesOrderItemQty,
+                salesOrderLineKet: salesOrderItemKet
             };
 
-            salesQuoteLine.push(salesQuoteItemLine);
-            console.log(salesQuoteLine);
+            salesOrderLine.push(salesOrderItemLine);
+            console.log(salesOrderLine);
         }
     }
 }
@@ -552,18 +570,18 @@ function removeItemLine(paramItemId) {
     }
 }
 
-function removeSalesQuoteLine(paramItemId) {
+function removeSalesOrderLine(paramItemId) {
     console.log(paramItemId);
-    if (salesQuoteLine.filter(e => e.salesQuoteLineId === paramItemId).length > -1) {
+    if (salesOrderLine.filter(e => e.salesOrderLineId === paramItemId).length > -1) {
         // console.log("BARANG SUDAH ADA");
-        var index = salesQuoteLine.findIndex(x => x.salesQuoteLineId == paramItemId);
+        var index = salesOrderLine.findIndex(x => x.salesOrderLineId == paramItemId);
         console.log(index);
 
         if(index > -1) {
             // remove element yg lama
-            salesQuoteLine.splice(index, 1);
+            salesOrderLine.splice(index, 1);
         }
-        console.log(salesQuoteLine);
+        console.log(salesOrderLine);
     }
 }
 
@@ -575,7 +593,7 @@ function hitungSubTotal(paramIdItemTable) {
     $('#lblSubTotal' + (paramIdItemTable)).html(accounting.formatMoney(subTotalPerLine, "Rp. ", 2, ".", ","));
 }
 
-function hitungSubTotalSalesQuoteLine(paramIdItemTable) {
+function hitungSubTotalSalesOrderLine(paramIdItemTable) {
     var subTotalSalesQuote = $('#txtItemQtyEditLine' + (paramIdItemTable)).val() * accounting.unformat($('#txtItemPriceEditLine' + (paramIdItemTable)).val(), ",");
     $('#lblSubTotalEditLine' + (paramIdItemTable)).html(accounting.formatMoney(subTotalSalesQuote, "Rp. ", 2, ".", ","));
 }

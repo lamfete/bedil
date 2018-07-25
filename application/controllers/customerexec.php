@@ -98,6 +98,9 @@ class Customerexec extends CI_Controller {
             if($type == 'autocomplete') {
                 $data['all_customer'] = $this->m_customer->get_customer_address_id("autocomplete", $_GET['query']);
             }
+            else if($type == 'modal') {
+                $data['all_customer'] = $this->m_customer->get_customer_address_id("autocomplete", $_GET['query']);
+            }
             // var_dump($data['all_user']);exit;
             // echo json_encode($data['all_user']);
 
