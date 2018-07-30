@@ -89,7 +89,7 @@
                         <ul class="dropdown-menu">
                         <li><a href="/salesquote/manage">Sales Quote</a></li>
                         <li><a href="/salesorder/manage">Sales Order</a></li>
-                        <li><a href="/purchase/add">Purchase</a></li>
+                        <li><a href="/salesshipper/manage">Sales Shipper</a></li>
                         <li><a href="/adjust">Adjustment</a></li>
                         <li role="separator" class="divider"></li>
                         <?php
