@@ -30,12 +30,12 @@ $(document).ready(function() {
     // array untuk mengecek apakah semua field mandatory sudah diisi semua atau belum
     validation = [];
     cart = [];
-    salesShipperLine = [];
-    salesShipper = [];
+    salesInvoiceLine = [];
+    salesInvoice = [];
     
     // Initialization end here
 
-    $('#tableSalesShipper').DataTable({
+    $('#tableInvoice').DataTable({
         "processing": true,
         "serverSide": true,
         "paging": true,
@@ -44,7 +44,7 @@ $(document).ready(function() {
         "bAutowidth": false,
         "ajax": {
             //url: '<?php echo base_url('userexec/get_user'); ?>',
-            url: '../salesshipperexec/get_sales_shipper?type=datatables',
+            url: '../invoiceexec/get_invoice?type=datatables',
             type: 'POST'
         },
         "columns": [
@@ -118,18 +118,18 @@ function clearTxtItemId() {
 }
 
 /*
- * Function enable tombol btnProceedSalesQuote
+ * Function enable tombol btnProceedSalesInvoice
  * 
  * Yang di cek adalah field: customer address
  * 
  */
-function enableButtonProceedSalesShipper() {
+function enableButtonProceedSalesInvoice() {
 
     if($('#txtCustAddId').val() == '') {
-        $('#btnProceedSalesShipper').prop('disabled', true);
+        $('#btnProceedSalesInvoice').prop('disabled', true);
     }
     else {
-        $('#btnProceedSalesShipper').prop('disabled', false);
+        $('#btnProceedSalesInvoice').prop('disabled', false);
     }
 }
 
@@ -212,24 +212,24 @@ function editSalesShipper(value) {
 };
 
 /*
- * function untuk mengisi modal process sales shipper
+ * function untuk mengisi modal process invoice
  * 
  * 
  * 
  */
-function proceedSalesShipper(value) {
+function proceedInvoice(value) {
     // console.log(value);
     clearTxtCustAddId();
-    var salesShipperNo = value[0];
+    var salesInvoiceNo = value[0];
     var customerId = value[2];
     var customerAddId = value[3];
     var keterangan = value[4];
     var userId = $('#userIdLogin').val();
-    console.log(salesShipperNo);
+    console.log(salesInvoiceNo);
 
-    $("#tableProcessSalesShipper tbody tr").remove(); 
+    $("#tableProcessSalesInvoice tbody tr").remove(); 
 
-    $("#lblProcessSalesShipperNo").text("Process Sales Shipper " + salesShipperNo);
+    $("#lblProcessSalesInvoiceNo").text("Process Invoice " + salesInvoiceNo);
     // $('#txtCustAddId').val(customerAddId);
 
     $.ajax({
@@ -241,7 +241,7 @@ function proceedSalesShipper(value) {
         success: function(data){
             $('#txtCustAddId').val(data.suggestions);
             // console.log(data.suggestions);
-            enableButtonProceedSalesShipper();
+            enableButtonProceedSalesInvoice();
         },
         error: function(data){
             console.log('Error:', data);
@@ -250,9 +250,9 @@ function proceedSalesShipper(value) {
     
     $.ajax({
         type: "POST",
-        url: "../salesshipperexec/get_sales_shipper_line",
+        url: "../invoiceexec/get_sales_invoice_line",
         data: {
-            salesShipperNo: salesShipperNo
+            salesInvoiceNo: salesInvoiceNo
         },
         success: function(data){
             // console.log(data);
@@ -261,24 +261,24 @@ function proceedSalesShipper(value) {
 
             for(var i=0;i<data.count;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_shipper_qty * data.data[i].sales_shipper_price;
+                var subTotal = data.data[i].sales_invoice_qty * data.data[i].sales_invoice_price;
 
                 // 2. memasukkan sales order line ke dalam bentuk array (untuk simpan data)
                 // init object
-                var salesShipperLineitem = {
-                    salesShipperLineId: data.data[i].item_id,
-                    salesShipperLinePrice: data.data[i].sales_shipper_price,
-                    salesShipperLineQty: data.data[i].sales_shipper_qty,
-                    salesShipperLineKet: data.data[i].keterangan
+                var salesInvoiceLineitem = {
+                    salesInvoiceLineId: data.data[i].item_id,
+                    salesInvoiceLinePrice: data.data[i].sales_shipper_price,
+                    salesInvoiceLineQty: data.data[i].sales_shipper_qty,
+                    salesInvoiceLineKet: data.data[i].keterangan
                 };
-                salesShipperLine.push(salesShipperLineitem);
+                salesInvoiceLine.push(salesInvoiceLineitem);
             }
 
-            salesShipper = {
-                salesShipperNo: salesShipperNo,
+            salesInvoice = {
+                salesInvoiceNo: salesInvoiceNo,
                 customerId: customerId,
                 keterangan: keterangan,
-                salesShipperLine: salesShipperLine,
+                salesInvoiceLine: salesInvoiceLine,
                 userId: userId
             }
             
@@ -286,19 +286,19 @@ function proceedSalesShipper(value) {
             
             for(var i=0;i<data.count;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_shipper_qty * data.data[i].sales_shipper_price;
+                var subTotal = data.data[i].sales_invoice_qty * data.data[i].sales_invoice_price;
 
                 // 1. memasukkan sales quote line ke dalam bentuk html (untuk tampilan)
                 content_process +="<tr><td style='line-height:2.6;' id='lblIdItemProcessLine"+ counter +"'>" + counter + "</td>";
                 content_process +="<td style='line-height:2.6;' class='salesOrderForRemove'  id='lblItemIdProcessLine"+ counter +"'>" + data.data[i].item_id + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemNameProcessLine"+ counter +"'>" + data.data[i].item_name + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].sales_shipper_qty + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].sales_shipper_price, "Rp. ", 2, ".", ",") + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].sales_invoice_qty + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].sales_invoice_price, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblSubTotalEditLine"+ counter +"' align='right'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemKeteranganProcessLine"+ counter +"'>" + data.data[i].keterangan + "</td>";
             }
 
-            $('#tableProcessSalesShipper').append(content_process);
+            $('#tableProcessSalesInvoice').append(content_process);
             // end here
         },
         error: function(data){
@@ -311,12 +311,12 @@ function proceedSalesShipper(value) {
  * Function untuk memproses SO menjadi Shipper
  * 
  */
-function proceedSoToShipper() {
-    var salesShipperNo = $("#lblProcessSalesShipperNo").text().substring(22, 32);
+function proceedInvoiceToFinish() {
+    var salesInvoiceNo = $("#lblProcessSalesInvoiceNo").text().substring(16, 26);
     var custAddId = $("#txtCustAddId").val().substring(0, 10);
     // var customerId = salesQuoteLine[0].customerId;
-    var customerId = salesShipper.customerId;
-    var keterangan = salesShipper.keterangan;
+    var customerId = salesInvoice.customerId;
+    var keterangan = salesInvoice.keterangan;
 
     // var custAddId = $('#txtCustAddId').val();
     // console.log($("#lblSalesQuoteNo").text().substring(20, 30));
@@ -324,29 +324,29 @@ function proceedSoToShipper() {
     // console.log(customerId);
     // console.log(custAddId);
 
-    var updateRecord = confirm("Yakin Sales Shipper " + salesShipperNo + " diproses menjadi Invoice?");
+    var updateRecord = confirm("Yakin Invoice " + salesInvoiceNo + " sudah dibayar lunas?");
 
     if(updateRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../salesshipperexec/proceed_sales_shipper",
+            url: "../invoiceexec/proceed_sales_invoice",
             data: {
-                salesShipperNo: salesShipperNo,
+                salesInvoiceNo: salesInvoiceNo,
                 customerId: customerId,
                 custAddId: custAddId,
                 keterangan: keterangan,
-                salesShipperLine: salesShipperLine,
+                salesInvoiceLine: salesInvoiceLine,
                 updatedBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                window.location.href = '../salesshipper/manage';
+                window.location.href = '../invoice/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '../salesshipper/manage';
+                window.location.href = '../invoice/manage';
             }
         });
     }

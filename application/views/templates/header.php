@@ -90,7 +90,7 @@
                         <li><a href="/salesquote/manage">Sales Quote</a></li>
                         <li><a href="/salesorder/manage">Sales Order</a></li>
                         <li><a href="/salesshipper/manage">Sales Shipper</a></li>
-                        <li><a href="/adjust">Adjustment</a></li>
+                        <li><a href="/invoice/manage">Invoice</a></li>
                         <li role="separator" class="divider"></li>
                         <?php
                             if($userlevel->user_level_id == 1) {
