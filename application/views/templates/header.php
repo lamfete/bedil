@@ -81,11 +81,41 @@
                             }
                         ?>
                         <li><a href="#">One more separated link</a></li>
+                        <li role="separator" class="divider"></li>
+                        <?php
+                            if($userlevel->user_level_id == 1) {
+                        ?>
+                        <li><a href="<?php echo "/supplier"; ?>">Supplier</a></li>
+                        <li><a href="<?php echo "/customer"; ?>">Customer</a></li>
+                        <?php
+                            }
+                        ?>
                         </ul>
                     </li>
 
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Transaction<span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Purchase<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                        <li><a href="/purchaseorder/manage">Purchase Order</a></li>
+                        <li><a href="/salesorder/manage">Good Receipt</a></li>
+                        <li><a href="/salesorder/manage">Account Payable</a></li>
+                        <li role="separator" class="divider"></li>
+                        <?php
+                            if($userlevel->user_level_id == 1) {
+                        ?>
+                        <li class="dropdown-header">List of</li>
+                        <li><a href="/sales/view">Sales History</a></li>
+                        <li><a href="/purchase/view">Purchase History</a></li>
+                        <li role="separator" class="divider"></li>
+                        <?php
+                            }
+                        ?>
+                        <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sales<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                         <li><a href="/salesquote/manage">Sales Quote</a></li>
                         <li><a href="/salesorder/manage">Sales Order</a></li>
