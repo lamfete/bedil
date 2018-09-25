@@ -7,6 +7,47 @@ class M_supplier extends CI_Model {
         parent::__construct();
     }
 
+    /*
+     * Function untuk autocomplete di menu sales quote
+     * Mendapatkan semua supplier_id yang ada di table supplier
+     * 
+     */
+    public function get_supplier_id($type, $input) {
+        $result = new stdClass();
+        $result_arr = array();
+
+        if($type=="autocomplete") {
+            
+            $sql1 = "
+                select concat(supplier_id, ' - ', supplier_address_1) as supplier_id
+                from supplier
+                where supplier_id like '%".$input."%'
+                or supplier_address_1 like '%".$input."%'
+                or supplier_address_2 like '%".$input."%';
+            ";
+
+            $q1 = $this->db->query($sql1);
+            // var_dump($q1->result_array());exit;
+
+            // get item all item rows
+            $item_rows_count = count($q1->result());
+            $num_rows = count($q1->result());
+        }
+        // var_dump($query->result_array());exit;
+        // var_dump($query->result()[0]->user_login);exit;
+
+        for($i=0; $i<count($q1->result()); $i++) {
+            $col_arr = array();
+            
+            foreach($q1->result_array()[$i] as $key => $value) {
+                array_push($result_arr, $value);
+            }
+        }
+        $result->suggestions = $result_arr;
+        // var_dump($result);exit;
+        return $result;
+    }
+
     public function get_all_supplier($type, $input) {
         $result = new stdClass();
         $result_arr = array();

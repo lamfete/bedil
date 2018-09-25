@@ -114,14 +114,14 @@ class M_purchaseorder extends CI_Model {
 
     public function set_new_purchase_order($param) {
         $result = new \stdClass();
-
+        
         if(count($param['shopping_cart']) > 0) {
             // var_dump($param[0]['itemLineId']);
             
             // insert into purchase_order_head
             $purchase_order_head = array(
                 'purchase_order_date' => date("Y-m-d H:i:s"),
-                'customer_id' => $param['customer_id'],
+                'supplier_id' => $param['supplier_id'],
                 'purchase_order_status' => 'OPEN',
                 'keterangan' => $param['keterangan'],
                 'created_at' => date("Y-m-d H:i:s"),
@@ -167,7 +167,7 @@ class M_purchaseorder extends CI_Model {
             }
 
             $log = array(
-                'tindakan' => $_SESSION['username'] . " CREATE NEW SALES QUOTE NO " . $purchase_order_no,
+                'tindakan' => $_SESSION['username'] . " CREATE NEW PURCHASE ORDER NO " . $purchase_order_no,
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['user_id']
             );
@@ -183,12 +183,12 @@ class M_purchaseorder extends CI_Model {
             }
             else {
                 $this->db->trans_commit();
-                $result->message = "Successfully create new sales quote";
+                $result->message = "Successfully create new purchase order";
                 return $result;
             }
         }
         else {
-            $result->message = "no sales quote data.";
+            $result->message = "no purchase order data.";
         }
 
         
@@ -198,14 +198,14 @@ class M_purchaseorder extends CI_Model {
         $result = new \stdClass();
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " DELETE SALES QUOTE NO. " . $param['salesQuoteNo'],
+            'tindakan' => $_SESSION['username'] . " DELETE PURCHASE ORDER NO. " . $param['purchaseOrderNo'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
 
         $this->db->trans_start();
-        $this->db->delete('purchase_order_line', array('purchase_order_no' => $param['salesQuoteNo']));
-        $this->db->delete('purchase_order_head', array('purchase_order_no' => $param['salesQuoteNo']));
+        $this->db->delete('purchase_order_line', array('purchase_order_no' => $param['purchaseOrderNo']));
+        $this->db->delete('purchase_order_head', array('purchase_order_no' => $param['purchaseOrderNo']));
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -218,7 +218,7 @@ class M_purchaseorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully delete sales quote";
+            $result->message = "Successfully delete purchase order.";
             return $result;
         }
     }
@@ -273,57 +273,56 @@ class M_purchaseorder extends CI_Model {
         $result = new \stdClass();
         // var_dump($param);exit;
 
-        $purchase_order_head = array(
-            'sales_order_date' => date("Y-m-d H:i:s"),
-            'purchase_order_no' => $param['salesQuoteNo'],
-            'customer_address_id' => $param['custAddId'],
-            'customer_id' => $param['customerId'],
-            'sales_order_status' => 'OPEN',
+        $good_receipt_head = array(
+            'good_receipt_date' => date("Y-m-d H:i:s"),
+            'good_receipt_no' => $param['purchaseOrderNo'],
+            'supplier_id' => $param['supplierId'],
+            'good_receipt_status' => 'OPEN',
             'keterangan' => $param['keterangan'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
 
         $this->db->trans_start();
-        $q1 = $this->db->insert('sales_order_head', $purchase_order_head);
+        $q1 = $this->db->insert('good_receipt_head', $good_receipt_head);
 
         $purchase_order_update = array(
-            'purchase_order_status' => 'ORDERED',
+            'purchase_order_status' => 'PURCHASED',
             'updated_at' => date("Y-m-d H:i:s"),
             'updated_by' => $param['updatedBy']
         );
 
-        $this->db->where('purchase_order_no', $param['salesQuoteNo']);
+        $this->db->where('purchase_order_no', $param['purchaseOrderNo']);
         $this->db->update('purchase_order_head', $purchase_order_update);
 
         $q2 = "
-                select sales_order_no 
-                from sales_order_head 
-                order by purchase_order_no desc 
+                select good_receipt_no 
+                from good_receipt_head 
+                order by good_receipt_no desc 
                 limit 0,1;
             ";
 
-        $sales_order_no = $this->db->query($q2)->result_array()[0]['sales_order_no'];
+        $good_receipt_no = $this->db->query($q2)->result_array()[0]['good_receipt_no'];
             // var_dump($purchase_order_no[0]['purchase_order_no']);
         
-        for($i=0;$i<count($param['salesQuoteLine']);$i++) {
+        for($i=0;$i<count($param['purchaseOrderLine']);$i++) {
             $data = array(
-                'sales_order_no' => $sales_order_no,
-                'item_id' => $param['salesQuoteLine'][$i]['salesQuoteLineId'],
-                'sales_order_qty' => $param['salesQuoteLine'][$i]['salesQuoteLineQty'],
-                'sales_order_price' => $param['salesQuoteLine'][$i]['salesQuoteLinePrice'],
-                'sales_order_line_status' => 'OPEN',
-                'keterangan' => $param['salesQuoteLine'][$i]['salesQuoteLineKet'],
+                'good_receipt_no' => $good_receipt_no,
+                'item_id' => $param['purchaseOrderLine'][$i]['purchaseOrderLineId'],
+                'good_receipt_qty' => $param['purchaseOrderLine'][$i]['purchaseOrderLineQty'],
+                'good_receipt_price' => $param['purchaseOrderLine'][$i]['purchaseOrderLinePrice'],
+                'good_receipt_line_status' => 'OPEN',
+                'keterangan' => $param['purchaseOrderLine'][$i]['purchaseOrderLineKet'],
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['updatedBy']
             );
         
-            $this->db->insert('sales_order_line', $data);
+            $this->db->insert('good_receipt_line', $data);
             $this->db->trans_complete();
         }
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " MEMPROSES SALES QUOTE NO " . $param['salesQuoteNo'] . " MENJADI SALES ORDER.",
+            'tindakan' => $_SESSION['username'] . " MEMPROSES PURCHASE ORDER NO " . $param['purchaseOrderNo'] . " MENJADI GOOD RECEIPT.",
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
@@ -340,7 +339,7 @@ class M_purchaseorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully proceed sale quote";
+            $result->message = "Successfully proceed purchase order.";
             return $result;
         }
     }

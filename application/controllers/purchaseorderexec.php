@@ -63,10 +63,9 @@ class Purchaseorderexec extends CI_Controller {
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
-            // var_dump($_POST['idItem']);exit;
             $data['purchase_order_line'] = $this->m_purchaseorder->get_purchase_order_line("purchaseorderline", $_POST['purchaseOrderNo']);
         }
-
+        // var_dump($data);exit;
         $this->output
         ->set_status_header(200)
         ->set_content_type('application/json', 'utf-8')
@@ -79,20 +78,20 @@ class Purchaseorderexec extends CI_Controller {
     public function create_new_purchase_order() {
         // $data = $_REQUEST['cart'];
         // $data = $_POST['shoppingCart'];
-        // $customer_id = $_POST['customerId'];
+        // $purchase_id = $_POST['purchaseId'];
 
         $user_id = $this->m_login->get_name($this->session->userdata('username'))->user_id;
         
         $data['shopping_cart'] = $_POST['shoppingCart'];
-        $data['customer_id'] = $_POST['customerId'];
+        $data['supplier_id'] = $_POST['supplierId'];
         $data['keterangan'] = $_POST['keterangan'];
         $data['user_id'] = $user_id;
 
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
-            // $result = $this->m_salesquote->set_new_purchase_order($data, $customer_id, $user_id);
-            $result = $this->m_salesquote->set_new_purchase_order($data);
+            // $result = $this->m_salesquote->set_new_purchase_order($data, $purchase_id, $user_id);
+            $result = $this->m_purchaseorder->set_new_purchase_order($data);
             // var_dump($_POST['shoppingCart']);
         }
         
@@ -106,7 +105,7 @@ class Purchaseorderexec extends CI_Controller {
     }
 
     /*
-     * Function untuk delete sales quote
+     * Function untuk delete purchase order
      * 
      */
     public function delete_purchase_order(){
@@ -116,7 +115,7 @@ class Purchaseorderexec extends CI_Controller {
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
-            $result = $this->m_salesquote->delete_purchase_order($data);
+            $result = $this->m_purchaseorder->delete_purchase_order($data);
         }
 
         $this->output
@@ -160,7 +159,7 @@ class Purchaseorderexec extends CI_Controller {
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
-            $result = $this->m_salesquote->proceed_purchase_order($data);
+            $result = $this->m_purchaseorder->proceed_purchase_order($data);
         }
 
         $this->output

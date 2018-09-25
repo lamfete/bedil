@@ -98,18 +98,18 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="lblProcessSalesQuoteNo">Process Sales Quote</h4>
+                <h4 class="modal-title" id="lblProcessPurchaseOrderNo">Process Purchase Order</h4>
             </div>
             <div class="modal-body">
                 <div class="row" style="margin-bottom:10px;">
                     <div class="col-xs-3">
-                        <label for="lblCustAddId">Customer Address:</label>
+                        <label for="lblSuppAddId">Supplier:</label>
                     </div>
                     <div class="col-xs-9">
-                        <input type="text" class="form-control" id="txtCustAddId" onfocusout="enableButtonProceedSalesQuote()" placeholder="Customer Address ID">
+                        <input type="text" class="form-control" id="txtSuppAddId" onfocusout="enableButtonProceedPurchaseOrder()" placeholder="Supplier">
                     </div>
                 </div>
-                <table id="tableProcessSalesQuote" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
+                <table id="tableProcessPurchaseOrder" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
                     <thead>
                         <tr>
                             <th width="1%"></th>
@@ -132,7 +132,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="btnProceedSalesQuote" onclick="proceedSqToSo()">Proceed Sales Quote</button>
+                <button type="button" class="btn btn-primary" id="btnProceedPurchaseOrder" onclick="proceedPoToGr()">Proceed Purchase Order</button>
             </div>
         </div>
     </div>

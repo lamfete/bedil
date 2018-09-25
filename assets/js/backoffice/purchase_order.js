@@ -71,8 +71,8 @@ $(document).ready(function() {
         "order": [[1, 'asc']]
     });
 
-    $('#txtCustId').autocomplete({
-        serviceUrl: '../customerexec/get_customer_id?type=autocomplete',
+    $('#txtSuppId').autocomplete({
+        serviceUrl: '../supplierexec/get_supplier_id?type=autocomplete',
         onSelect: function (suggestion) {
             var itemId = suggestion.value.substring(0, 10);
             // console.log(itemId);
@@ -82,8 +82,8 @@ $(document).ready(function() {
         }
     });
 
-    $('#txtCustAddId').autocomplete({
-        serviceUrl: '../customerexec/get_customer_address_id?type=autocomplete',
+    $('#txtSuppAddId').autocomplete({
+        serviceUrl: '../supplierexec/get_supplier_id?type=autocomplete',
         onSelect: function (suggestion) {
             var itemId = suggestion.value.substring(0, 10);
             // console.log(itemId);
@@ -105,8 +105,8 @@ $(document).ready(function() {
     });
 } );
 
-function clearTxtCustId() {
-    $('#txtItemId').val('');
+function clearTxtSuppId() {
+    $('#txtSuppId').val('');
 }
 
 function clearTxtCustAddId() {
@@ -117,19 +117,25 @@ function clearTxtItemId() {
     $('#txtItemId').val('');
 }
 
+function clearAddItemPurchaseTextfield() {
+    clearTxtItemId();
+    $('#txtItemPrice').val('');
+    $('#txtItemQty').val('');
+}
+
 /*
  * Function enable tombol btnProceedSalesQuote
  * 
  * Yang di cek adalah field: customer address
  * 
  */
-function enableButtonProceedSalesQuote() {
+function enableButtonProceedPurchaseOrder() {
 
-    if($('#txtCustAddId').val() == '') {
-        $('#btnProceedSalesQuote').prop('disabled', true);
+    if($('#txtSuppAddId').val() == '') {
+        $('#btnProceedPurchaseOrder').prop('disabled', true);
     }
     else {
-        $('#btnProceedSalesQuote').prop('disabled', false);
+        $('#btnProceedPurchaseOrder').prop('disabled', false);
     }
 }
 
@@ -212,75 +218,75 @@ function editPurchaseOrder(value) {
 };
 
 /*
- * function untuk mengisi modal process sales quote
+ * function untuk mengisi modal process purchase order
  * 
  * 
  * 
  */
-function proceedSalesQuote(value) {
+function proceedPurchaseOrder(value) {
     // console.log(value);
-    clearTxtCustAddId();
-    var salesQuoteNo = value[0];
-    var customerId = value[2];
+    // clearTxtSuppAddId();
+    var purchaseOrderNo = value[0];
+    var supplierId = value[2];
     var keterangan = value[3];
     var userId = $('#userIdLogin').val();
-    console.log(salesQuoteNo);
+    console.log(purchaseOrderNo);
 
-    $("#tableProcessSalesQuote tbody tr").remove(); 
-
-    $("#lblProcessSalesQuoteNo").text("Process Sales Quote " + salesQuoteNo);
+    $("#tableProcessPurchaseOrder tbody tr").remove(); 
+    $("#txtSuppAddId").val(supplierId);
+    $("#lblProcessPurchaseOrderNo").text("Process Sales Quote " + purchaseOrderNo);
     
     $.ajax({
         type: "POST",
-        url: "../salesquoteexec/get_sales_quote_line",
+        url: "../purchaseorderexec/get_purchase_order_line",
         data: {
-            salesQuoteNo: salesQuoteNo
+            purchaseOrderNo: purchaseOrderNo
         },
         success: function(data){
-            // console.log(data.data[0].brand_id);
+            console.log(data.data.length);
 
             var content_process = '';
 
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+                var subTotal = data.data[i].purchase_order_qty * data.data[i].purchase_order_price;
 
                 // 2. memasukkan sales quote line ke dalam bentuk array (untuk simpan data)
                 // init object
-                var salesQuoteLineitem = {
-                    salesQuoteLineId: data.data[i].item_id,
-                    salesQuoteLinePrice: data.data[i].sales_quote_price,
-                    salesQuoteLineQty: data.data[i].sales_quote_qty,
-                    salesQuoteLineKet: data.data[i].keterangan
+                var purchaseOrderLineitem = {
+                    purchaseOrderLineId: data.data[i].item_id,
+                    purchaseOrderLinePrice: data.data[i].purchase_order_price,
+                    purchaseOrderLineQty: data.data[i].purchase_order_qty,
+                    purchaseOrderLineKet: data.data[i].keterangan
                 };
-                salesQuoteLine.push(salesQuoteLineitem);
+                purchaseOrderLine.push(purchaseOrderLineitem);
             }
 
-            salesQuote = {
-                salesQuoteNo: salesQuoteNo,
-                customerId: customerId,
+            purchaseOrder = {
+                purchaseOrderNo: purchaseOrderNo,
+                supplierId: supplierId,
                 keterangan: keterangan,
-                salesQuoteLine: salesQuoteLine,
+                purchaseOrderLine: purchaseOrderLine,
                 userId: userId
             }
             
-            // console.log(salesQuoteLine);
+            // console.log(purchaseOrderLine);
             
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].sales_quote_qty * data.data[i].sales_quote_price;
+                var subTotal = data.data[i].purchase_order_qty * data.data[i].purchase_order_price;
 
                 // 1. memasukkan sales quote line ke dalam bentuk html (untuk tampilan)
                 content_process +="<tr><td style='line-height:2.6;' id='lblIdItemProcessLine"+ counter +"'>" + counter + "</td>";
                 content_process +="<td style='line-height:2.6;' class='purchaseOrderForRemove'  id='lblItemIdProcessLine"+ counter +"'>" + data.data[i].item_id + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemNameProcessLine"+ counter +"'>" + data.data[i].item_name + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].sales_quote_qty + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].sales_quote_price, "Rp. ", 2, ".", ",") + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].purchase_order_qty + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].purchase_order_price, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblSubTotalEditLine"+ counter +"' align='right'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemKeteranganProcessLine"+ counter +"'>" + data.data[i].keterangan + "</td>";
             }
 
-            $('#tableProcessSalesQuote').append(content_process);
+            $('#tableProcessPurchaseOrder').append(content_process);
             // end here
         },
         error: function(data){
@@ -293,42 +299,41 @@ function proceedSalesQuote(value) {
  * Function untuk memproses SQ menjadi SO
  * 
  */
-function proceedSqToSo() {
-    var salesQuoteNo = $("#lblProcessSalesQuoteNo").text().substring(20, 30);
-    var custAddId = $("#txtCustAddId").val().substring(0, 10);
-    // var customerId = salesQuoteLine[0].customerId;
-    var customerId = salesQuote.customerId;
-    var keterangan = salesQuote.keterangan;
+function proceedPoToGr() {
+    var purchaseOrderNo = $("#lblProcessPurchaseOrderNo").text().substring(20, 30);
+    var supplierId = $("#txtSuppAddId").val().substring(0, 10);
+    // var supplierId = purchaseOrderLine[0].supplierId;
+    var supplierId = purchaseOrder.supplierId;
+    var keterangan = purchaseOrder.keterangan;
 
     // var custAddId = $('#txtCustAddId').val();
-    // console.log($("#lblSalesQuoteNo").text().substring(20, 30));
-    // console.log(salesQuoteLine);
-    // console.log(customerId);
+    // console.log($("#lblPurchaseOrderNo").text().substring(20, 30));
+    // console.log(purchaseOrderLine);
+    // console.log(supplierId);
     // console.log(custAddId);
 
-    var updateRecord = confirm("Yakin Sales Quote " + salesQuoteNo + " diproses menjadi Sales Order?");
+    var updateRecord = confirm("Yakin Purchase Order " + purchaseOrderNo + " diproses menjadi Good Receipt?");
 
     if(updateRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../salesquoteexec/proceed_sales_quote",
+            url: "../purchaseorderexec/proceed_purchase_order",
             data: {
-                salesQuoteNo: salesQuoteNo,
-                customerId: customerId,
-                custAddId: custAddId,
+                purchaseOrderNo: purchaseOrderNo,
+                supplierId: supplierId,
                 keterangan: keterangan,
-                salesQuoteLine: salesQuoteLine,
+                purchaseOrderLine: purchaseOrderLine,
                 updatedBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                window.location.href = '../salesquote/manage';
+                // window.location.href = '../purchaseorder/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '../salesquote/manage';
+                // window.location.href = '../purchaseorder/manage';
             }
         });
     }
@@ -349,33 +354,33 @@ $(document).on('click', 'button.btnRemovePurchaseOrderLine', function () {
 });
 
 /*
- * function untuk delete sales quote
+ * function untuk delete purchase order
  * 
  * 
  */
-function deleteSalesQuote(value) {
+function deletePurchaseOrder(value) {
     // console.log(value);
 
-    var deleteRecord = confirm("Yakin hapus data sales quote " + value[0] + " dari database?");
+    var deleteRecord = confirm("Yakin hapus data purchase order " + value[0] + " dari database?");
 
     if(deleteRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../salesquoteexec/delete_sales_quote",
+            url: "../purchaseorderexec/delete_purchase_order",
             data: {
-                salesQuoteNo: value[0],
-                salesQuoteCust: value[2],
+                purchaseOrderNo: value[0],
+                purchaseOrderSupp: value[2],
                 createdBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL DELETE USER");
                 alert(resp.message);
-                window.location.href = '/salesquote/manage';
+                window.location.href = '/purchaseorder/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '/salesquote/manage';
+                window.location.href = '/purchaseorder/manage';
             }
         });
     }
@@ -409,8 +414,8 @@ function updatePurchaseOrder() {
     }
 };
 
-var idItemTableItemSales = 1;
-function addItemToTableItemSales() {
+var idItemTableItemPurchase = 1;
+function addItemToTableItemPurchase() {
     var itemPrice = 0;
     var itemId = "";
 
@@ -437,26 +442,26 @@ function addItemToTableItemSales() {
         // console.log($('#txtItemPrice').autoNumeric('get'));
         var subTotal = $('#txtItemQty').val() * $('#txtItemPrice').autoNumeric('get');
 
-        var data="<tr><td style='line-height:2.6;' id='lblIdItemLine"+ idItemTableItemSales +"'>" + idItemTableItemSales + "</td>";
-        data +="<td style='line-height:2.6;' class='itemIdForRemove'  id='lblItemIdLine"+ idItemTableItemSales +"'>" + itemId + "</td>";
-        data +="<td style='line-height:2.6;' id='lblItemNameLine"+ idItemTableItemSales +"'>" + itemName + "</td>";
-        data +="<td><input type='text' id='txtItemQtyLine"+ idItemTableItemSales +"' class='form-control' value='" + $('#txtItemQty').val() + "' onfocusout='editItemLine("+idItemTableItemSales+")'/></td>";
-        data +="<td><input type='text' id='txtItemPriceLine"+ idItemTableItemSales +"' class='form-control' value='" + $('#txtItemPrice').val() + "' data-a-sign='Rp. ' data-a-dec=',' data-a-sep='.' onfocusout='editItemLine("+idItemTableItemSales+")'/></td>";
-        data +="<td id='lblSubTotal"+ idItemTableItemSales +"' style='line-height:2.6;'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
-        data +="<td><input type='text' id='txtItemKetLine"+ idItemTableItemSales +"' class='form-control' value='-' onfocusout='editItemLine("+idItemTableItemSales+")'/></td>";
+        var data="<tr><td style='line-height:2.6;' id='lblIdItemLine"+ idItemTableItemPurchase +"'>" + idItemTableItemPurchase + "</td>";
+        data +="<td style='line-height:2.6;' class='itemIdForRemove'  id='lblItemIdLine"+ idItemTableItemPurchase +"'>" + itemId + "</td>";
+        data +="<td style='line-height:2.6;' id='lblItemNameLine"+ idItemTableItemPurchase +"'>" + itemName + "</td>";
+        data +="<td><input type='text' id='txtItemQtyLine"+ idItemTableItemPurchase +"' class='form-control' value='" + $('#txtItemQty').val() + "' onfocusout='editItemLine("+idItemTableItemPurchase+")'/></td>";
+        data +="<td><input type='text' id='txtItemPriceLine"+ idItemTableItemPurchase +"' class='form-control' value='" + $('#txtItemPrice').val() + "' data-a-sign='Rp. ' data-a-dec=',' data-a-sep='.' onfocusout='editItemLine("+idItemTableItemPurchase+")'/></td>";
+        data +="<td id='lblSubTotal"+ idItemTableItemPurchase +"' style='line-height:2.6;'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
+        data +="<td><input type='text' id='txtItemKetLine"+ idItemTableItemPurchase +"' class='form-control' value='-' onfocusout='editItemLine("+idItemTableItemPurchase+")'/></td>";
         data +="<td align='center' style='line-height:2.6;'><button type='button' class='btnRemove btn btn-link'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td></tr>";
         $('#tableItem').append(data);
-        $('#txtItemPriceLine'+ idItemTableItemSales).autoNumeric('init');
-        idItemTableItemSales++;
+        $('#txtItemPriceLine'+ idItemTableItemPurchase).autoNumeric('init');
+        idItemTableItemPurchase++;
 
         // clear textfield
-        clearAddItemSaleTextfield();
+        clearAddItemPurchaseTextfield();
 
         console.log(cart);
     }
     else {
         alert("Barang sudah ada.");
-        clearAddItemSaleTextfield();
+        clearAddItemPurchaseTextfield();
         console.log(cart);
     }
 }
@@ -588,11 +593,11 @@ function hitungSubTotalPurchaseOrderLine(paramIdItemTable) {
  */
 function createNewPurchaseOrder() {
     console.log(cart);
-    customerId = $('#txtCustId').val().substring(0, 10);
+    supplierId = $('#txtSuppId').val().substring(0, 10);
     keterangan = $('#txtKeterangan').val();
     $.ajax({
         type: "POST",
-        url: "../salesquoteexec/create_new_sales_quote",
+        url: "../purchaseorderexec/create_new_purchase_order",
         /*data: {
             itemCat: category,
             itemType: type,
@@ -603,7 +608,7 @@ function createNewPurchaseOrder() {
             createdBy: createdby
         },*/
         data: {
-            customerId: customerId,
+            supplierId: supplierId,
             shoppingCart: cart,
             keterangan: keterangan
              // kirim dari dari javascript dalam bentuk array of object, diterima oleh PHP array of array
@@ -611,12 +616,12 @@ function createNewPurchaseOrder() {
         success: function(resp) {
             // alert("SUKSES BUAT USER BARU");
             alert(resp.message);
-            window.location.href = '/salesquote/manage';
+            // window.location.href = '/purchaseorder/manage';
         },
         error: function(resp) {
             // alert("something went wrong");
             alert('Error: ', resp.message);
-            window.location.href = '/salesquote/manage';
+            // window.location.href = '/purchaseorder/manage';
         }
     }); 
 }
