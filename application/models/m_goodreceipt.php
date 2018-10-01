@@ -1,13 +1,13 @@
 <?php
 if(!defined('BASEPATH')) exit('Hacking Attempt');
 
-class M_purchaseorder extends CI_Model {
+class M_goodreceipt extends CI_Model {
 
     public function __construct() {
         parent::__construct();
     }
 
-    public function get_all_purchase_order($type, $input) {
+    public function get_all_good_receipt($type, $input) {
         $result = new stdClass();
         $result_arr = array();
 
@@ -20,17 +20,17 @@ class M_purchaseorder extends CI_Model {
              * 
              */
             $sql1 = "
-                select purchase_order_no, purchase_order_date, supplier_id, keterangan, purchase_order_status
-                from purchase_order_head 
+                select good_receipt_no, good_receipt_date, supplier_id, keterangan, good_receipt_status
+                from good_receipt_head 
                 limit ".$input['start'].", ".$input['length'].";
             ";
             
             /*
-             * query untuk jumlah purchase_order_head
+             * query untuk jumlah sales_quote_head
              * 
              */
             $sql2 = "
-                select * from purchase_order_head;
+                select * from good_receipt_head;
             ";
 
             $q1 = $this->db->query($sql1);
@@ -42,12 +42,11 @@ class M_purchaseorder extends CI_Model {
             $num_rows = count($q2->result());
         } elseif($type=="search") {
             $sql1 = "
-            select purchase_order_no, purchase_order_date, supplier_id, keterangan, purchase_order_status
-                from purchase_order_head 
-                where purchase_order_no like '%".$input['search']."%'
-                or purchase_order_date like '%".$input['search']."%'
-                or supplier_id like '%".$input['search']."%'
-                or purchase_order_status like '%".$input['search']."%'
+            select good_receipt_no, good_receipt_date, supplier_id, keterangan, good_receipt_status
+                from good_receipt_head 
+                where good_receipt_no like '%".$input['search']."%'
+                or good_receipt_date like '%".$input['search']."%'
+                or good_receipt_status like '%".$input['search']."%'
                 limit ".$input['start'].", ".$input['length'].";
             ";
 
@@ -73,9 +72,9 @@ class M_purchaseorder extends CI_Model {
             }
             $implode = json_encode($col_arr);
             array_push($col_arr, "
-                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editPurchaseOrder(".$implode.")'>Edit</a>
-                <a class='btn btn-default' role='button' onclick='deletePurchaseOrder(".$implode.")'>Delete</a>
-                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#processModal' onclick='proceedPurchaseOrder(".$implode.")'>Process</a>
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editGoodReceipt(".$implode.")'>Edit</a>
+                <a class='btn btn-default' role='button' onclick='deleteGoodReceipt(".$implode.")'>Delete</a>
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#processModal' onclick='proceedGoodReceipt(".$implode.")'>Process</a>
             ");
             
             array_push($result_arr, $col_arr);
@@ -86,21 +85,21 @@ class M_purchaseorder extends CI_Model {
         return $result;
     }
 
-    public function get_purchase_order_line($type, $param) {
+    public function get_good_receipt_line($type, $param) {
         $result = new \stdClass();
         
-        if($type == 'purchaseorderline') {
-            $this->db->select('purchase_order_line.purchase_order_no, purchase_order_line.item_id, item.item_name, purchase_order_line.purchase_order_qty, purchase_order_line.purchase_order_price, purchase_order_line.keterangan');
-            $this->db->from('purchase_order_line');
-            $this->db->join('item', 'purchase_order_line.item_id = item.item_id');
-            $this->db->where('purchase_order_no', $param);
+        if($type == 'goodreceiptline') {
+            $this->db->select('good_receipt_line.good_receipt_no, good_receipt_line.item_id, item.item_name, good_receipt_line.good_receipt_qty, good_receipt_line.good_receipt_price, good_receipt_line.keterangan');
+            $this->db->from('good_receipt_line');
+            $this->db->join('item', 'good_receipt_line.item_id = item.item_id');
+            $this->db->where('good_receipt_no', $param);
         } 
 
         $query = $this->db->get();
         $num_rows = $query->num_rows();
 
         if($num_rows > 0) {
-            $result->purchase_order_no = $query->result_array()[0]['purchase_order_no'];
+            $result->good_receipt_no = $query->result_array()[0]['good_receipt_no'];
             $result->count = $num_rows;
         } else {
             $result->message = "Free to go";
@@ -112,62 +111,62 @@ class M_purchaseorder extends CI_Model {
         return $result;
     }
 
-    public function set_new_purchase_order($param) {
+    public function set_new_sales_quote($param) {
         $result = new \stdClass();
-        
+
         if(count($param['shopping_cart']) > 0) {
             // var_dump($param[0]['itemLineId']);
             
-            // insert into purchase_order_head
-            $purchase_order_head = array(
-                'purchase_order_date' => date("Y-m-d H:i:s"),
+            // insert into sales_quote_head
+            $sales_quote_head = array(
+                'sales_quote_date' => date("Y-m-d H:i:s"),
                 'supplier_id' => $param['supplier_id'],
-                'purchase_order_status' => 'OPEN',
+                'sales_quote_status' => 'OPEN',
                 'keterangan' => $param['keterangan'],
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['user_id']
             );
 
             $this->db->trans_start();
-            $q1 = $this->db->insert('purchase_order_head', $purchase_order_head);
+            $q1 = $this->db->insert('sales_quote_head', $sales_quote_head);
 
-            /*$this->db->select('purchase_order_date');
-            $this->db->from('purchase_order_head');
-            $this->db->order_by('purchase_order_date', 'DESC');
+            /*$this->db->select('sales_quote_date');
+            $this->db->from('sales_quote_head');
+            $this->db->order_by('sales_quote_date', 'DESC');
             $this->db->limit(0, 1);
 
-            $purchase_order_no = $this->db->get();*/
-            // print_r($purchase_order_no->result_array());
+            $sales_quote_no = $this->db->get();*/
+            // print_r($sales_quote_no->result_array());
             $q2 = "
-                select purchase_order_no 
-                from purchase_order_head 
-                order by purchase_order_date desc 
+                select sales_quote_no 
+                from sales_quote_head 
+                order by sales_quote_date desc 
                 limit 0,1;
             ";
 
-            $purchase_order_no = $this->db->query($q2)->result_array()[0]['purchase_order_no'];
-            // var_dump($purchase_order_no[0]['purchase_order_no']);
+            $sales_quote_no = $this->db->query($q2)->result_array()[0]['sales_quote_no'];
+            // var_dump($sales_quote_no[0]['sales_quote_no']);
 
             for($i=0;$i<count($param['shopping_cart']);$i++) {
-                // insert into purchase_order_line
-                $purchase_order_line = array(
-                    'purchase_order_no' => $purchase_order_no,
+                // insert into sales_quote_line
+                $sales_quote_line = array(
+                    'sales_quote_no' => $sales_quote_no,
                     'item_id' => $param['shopping_cart'][$i]['itemLineId'],
-                    'purchase_order_qty' => $param['shopping_cart'][$i]['itemLineQty'],
-                    'purchase_order_price' => $param['shopping_cart'][$i]['itemLinePrice'],
-                    'purchase_order_line_status' => 'OPEN',
+                    'sales_quote_qty' => $param['shopping_cart'][$i]['itemLineQty'],
+                    'sales_quote_price' => $param['shopping_cart'][$i]['itemLinePrice'],
+                    'sales_quote_line_status' => 'OPEN',
                     'keterangan' => $param['shopping_cart'][$i]['itemLineKet'],
                     'created_at' => date("Y-m-d H:i:s"),
                     'created_by' => $param['user_id']
                 );
 
-                // $q1 = $this->db->insert('purchase_order_head', $purchase_order_head);
+                // $q1 = $this->db->insert('sales_quote_head', $sales_quote_head);
                 
-                $q3 = $this->db->insert('purchase_order_line', $purchase_order_line);
+                $q3 = $this->db->insert('sales_quote_line', $sales_quote_line);
             }
 
             $log = array(
-                'tindakan' => $_SESSION['username'] . " CREATE NEW PURCHASE ORDER NO " . $purchase_order_no,
+                'tindakan' => $_SESSION['username'] . " CREATE NEW SALES QUOTE NO " . $sales_quote_no,
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['user_id']
             );
@@ -183,29 +182,29 @@ class M_purchaseorder extends CI_Model {
             }
             else {
                 $this->db->trans_commit();
-                $result->message = "Successfully create new purchase order";
+                $result->message = "Successfully create new sales quote";
                 return $result;
             }
         }
         else {
-            $result->message = "no purchase order data.";
+            $result->message = "no sales quote data.";
         }
 
         
     }
 
-    public function delete_purchase_order($param) {
+    public function delete_good_receipt($param) {
         $result = new \stdClass();
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " DELETE PURCHASE ORDER NO. " . $param['purchaseOrderNo'],
+            'tindakan' => $_SESSION['username'] . " DELETE SALES ORDER NO. " . $param['goodReceiptNo'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
 
         $this->db->trans_start();
-        $this->db->delete('purchase_order_line', array('purchase_order_no' => $param['purchaseOrderNo']));
-        $this->db->delete('purchase_order_head', array('purchase_order_no' => $param['purchaseOrderNo']));
+        $this->db->delete('good_receipt_line', array('good_receipt_no' => $param['goodReceiptNo']));
+        $this->db->delete('good_receipt_head', array('good_receipt_no' => $param['goodReceiptNo']));
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -218,36 +217,36 @@ class M_purchaseorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully delete purchase order.";
+            $result->message = "Successfully delete Good Receipt";
             return $result;
         }
     }
 
-    public function update_purchase_order($param) {
+    public function update_good_receipt($param) {
         $result = new \stdClass();
         // var_dump($param);exit;
 
         $this->db->trans_start();
-        $this->db->delete('purchase_order_line', array('purchase_order_no' => $param['purchaseOrderNo']));
-        for($i=0;$i<count($param['purchaseOrderLine']);$i++) {
+        $this->db->delete('good_receipt_line', array('good_receipt_no' => $param['goodReceiptNo']));
+        for($i=0;$i<count($param['goodReceiptLine']);$i++) {
             $data = array(
-                'purchase_order_no' => $param['purchaseOrderNo'],
-                'item_id' => $param['purchaseOrderLine'][$i]['purchaseOrderLineId'],
-                'purchase_order_qty' => $param['purchaseOrderLine'][$i]['purchaseOrderLineQty'],
-                'purchase_order_price' => $param['purchaseOrderLine'][$i]['purchaseOrderLinePrice'],
-                'keterangan' => $param['purchaseOrderLine'][$i]['purchaseOrderLineKet'],
+                'good_receipt_no' => $param['goodReceiptNo'],
+                'item_id' => $param['goodReceiptLine'][$i]['goodReceiptLineId'],
+                'good_receipt_qty' => $param['goodReceiptLine'][$i]['goodReceiptLineQty'],
+                'good_receipt_price' => $param['goodReceiptLine'][$i]['goodReceiptLinePrice'],
+                'keterangan' => $param['goodReceiptLine'][$i]['goodReceiptLineKet'],
                 'updated_at' => date("Y-m-d H:i:s"),
                 'updated_by' => $param['updatedBy']
             );
 
-            /*$this->db->where('purchase_order_no', $param['purchaseOrderNo']);
-            $this->db->where('item_id', $param['purchaseOrderLine'][$i]['purchaseOrderLineId']);
-            $this->db->update('purchase_order_line', $data);*/
-            $this->db->insert('purchase_order_line', $data);
+            /*$this->db->where('good_receipt_no', $param['goodReceiptNo']);
+            $this->db->where('item_id', $param['goodReceiptLine'][$i]['goodReceiptLineId']);
+            $this->db->update('good_receipt_line', $data);*/
+            $this->db->insert('good_receipt_line', $data);
         }
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " UPDATE PURCHASE ORDER NO " . $param['purchaseOrderNo'],
+            'tindakan' => $_SESSION['username'] . " UPDATE GOOD RECEIPT NO " . $param['goodReceiptNo'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
@@ -264,65 +263,65 @@ class M_purchaseorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update purchase order";
+            $result->message = "Successfully update good receipt";
             return $result;
         }
     }
 
-    public function proceed_purchase_order($param) {
+    public function proceed_good_receipt($param) {
         $result = new \stdClass();
         // var_dump($param);exit;
 
         $good_receipt_head = array(
-            'good_receipt_date' => date("Y-m-d H:i:s"),
-            'purchase_order_no' => $param['purchaseOrderNo'],
+            'acc_payable_date' => date("Y-m-d H:i:s"),
+            'good_receipt_no' => $param['goodReceiptNo'],
             'supplier_id' => $param['supplierId'],
-            'good_receipt_status' => 'OPEN',
+            'acc_payable_status' => 'OPEN',
             'keterangan' => $param['keterangan'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
 
         $this->db->trans_start();
-        $q1 = $this->db->insert('good_receipt_head', $good_receipt_head);
+        $q1 = $this->db->insert('acc_payable_head', $good_receipt_head);
 
-        $purchase_order_update = array(
-            'purchase_order_status' => 'PURCHASED',
+        $good_receipt_update = array(
+            'good_receipt_status' => 'RECEIVED',
             'updated_at' => date("Y-m-d H:i:s"),
             'updated_by' => $param['updatedBy']
         );
 
-        $this->db->where('purchase_order_no', $param['purchaseOrderNo']);
-        $this->db->update('purchase_order_head', $purchase_order_update);
+        $this->db->where('good_receipt_no', $param['goodReceiptNo']);
+        $this->db->update('good_receipt_head', $good_receipt_update);
 
         $q2 = "
-                select good_receipt_no 
-                from good_receipt_head 
-                order by good_receipt_no desc 
+                select acc_payable_no 
+                from acc_payable_head 
+                order by acc_payable_no desc 
                 limit 0,1;
             ";
 
-        $good_receipt_no = $this->db->query($q2)->result_array()[0]['good_receipt_no'];
-            // var_dump($purchase_order_no[0]['purchase_order_no']);
+        $acc_payable_no = $this->db->query($q2)->result_array()[0]['acc_payable_no'];
+            // var_dump($sales_quote_no[0]['sales_quote_no']);
         
-        for($i=0;$i<count($param['purchaseOrderLine']);$i++) {
+        for($i=0;$i<count($param['goodReceiptLine']);$i++) {
             $data = array(
-                'good_receipt_no' => $good_receipt_no,
-                'item_id' => $param['purchaseOrderLine'][$i]['purchaseOrderLineId'],
-                'good_receipt_qty' => $param['purchaseOrderLine'][$i]['purchaseOrderLineQty'],
-                'good_receipt_price' => $param['purchaseOrderLine'][$i]['purchaseOrderLinePrice'],
-                'good_receipt_line_status' => 'OPEN',
-                'keterangan' => $param['purchaseOrderLine'][$i]['purchaseOrderLineKet'],
+                'acc_payable_no' => $acc_payable_no,
+                'item_id' => $param['goodReceiptLine'][$i]['goodReceiptLineId'],
+                'acc_payable_qty' => $param['goodReceiptLine'][$i]['goodReceiptLineQty'],
+                'acc_payable_price' => $param['goodReceiptLine'][$i]['goodReceiptLinePrice'],
+                'acc_payable_line_status' => 'OPEN',
+                'keterangan' => $param['goodReceiptLine'][$i]['goodReceiptLineKet'],
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['updatedBy']
             );
         
-            $this->db->insert('good_receipt_line', $data);
+            $this->db->insert('acc_payable_line', $data);
             $this->db->trans_complete();
         }
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " MEMPROSES PURCHASE ORDER NO " . $param['purchaseOrderNo'] . " MENJADI GOOD RECEIPT.",
+            'tindakan' => $_SESSION['username'] . " MEMPROSES GOOD RECEIPT NO " . $param['goodReceiptNo'] . " MENJADI ACC PAYABLE.",
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
@@ -339,7 +338,7 @@ class M_purchaseorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully proceed purchase order.";
+            $result->message = "Successfully proceed good receipt";
             return $result;
         }
     }

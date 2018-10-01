@@ -97,7 +97,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Purchase<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                         <li><a href="/purchaseorder/manage">Purchase Order</a></li>
-                        <li><a href="/salesorder/manage">Good Receipt</a></li>
+                        <li><a href="/goodreceipt/manage">Good Receipt</a></li>
                         <li><a href="/salesorder/manage">Account Payable</a></li>
                         <li role="separator" class="divider"></li>
                         <?php
