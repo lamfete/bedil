@@ -98,7 +98,7 @@
                         <ul class="dropdown-menu">
                         <li><a href="/purchaseorder/manage">Purchase Order</a></li>
                         <li><a href="/goodreceipt/manage">Good Receipt</a></li>
-                        <li><a href="/salesorder/manage">Account Payable</a></li>
+                        <li><a href="/accpayable/manage">Account Payable</a></li>
                         <li role="separator" class="divider"></li>
                         <?php
                             if($userlevel->user_level_id == 1) {

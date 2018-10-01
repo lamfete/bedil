@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     hideNotification();
 
-    $('#btnProceedGoodReceipt').prop('disabled', true);
+    $('#btnProceedAccPayable').prop('disabled', true);
 
     // autoNumeric init
     $('#txtItemPrice').autoNumeric('init');
@@ -30,12 +30,12 @@ $(document).ready(function() {
     // array untuk mengecek apakah semua field mandatory sudah diisi semua atau belum
     validation = [];
     cart = [];
-    goodReceiptLine = [];
-    goodReceipt = [];
+    accPayableLine = [];
+    accPayable = [];
     
     // Initialization end here
 
-    $('#tableGoodReceipt').DataTable({
+    $('#tableAccPayable').DataTable({
         "processing": true,
         "serverSide": true,
         "paging": true,
@@ -44,7 +44,7 @@ $(document).ready(function() {
         "bAutowidth": false,
         "ajax": {
             //url: '<?php echo base_url('userexec/get_user'); ?>',
-            url: '../goodreceiptexec/get_good_receipt?type=datatables',
+            url: '../accpayableexec/get_acc_payable?type=datatables',
             type: 'POST'
         },
         "columns": [
@@ -123,13 +123,13 @@ function clearTxtItemId() {
  * Yang di cek adalah field: customer address
  * 
  */
-function enableButtonProceedGoodReceipt() {
+function enableButtonProceedAccPayable() {
 
     if($('#txtSuppAddId').val() == '') {
-        $('#btnProceedGoodReceipt').prop('disabled', true);
+        $('#btnProceedAccPayable').prop('disabled', true);
     }
     else {
-        $('#btnProceedGoodReceipt').prop('disabled', false);
+        $('#btnProceedAccPayable').prop('disabled', false);
     }
 }
 
@@ -139,21 +139,21 @@ function enableButtonProceedGoodReceipt() {
  * 
  * 
  */
-function editGoodReceipt(value) {
+function editAccPayable(value) {
     // console.log(value);
     // goodReceiptLine = [];
-    $("#tableEditGoodReceipt tbody tr").remove(); 
+    $("#tableEditAccPayable tbody tr").remove(); 
     // console.log(salesQuoteLine); // output: []
     
-    var goodReceiptNo = value[0];
-    console.log(goodReceiptNo);
-    $("#lblGoodReceiptNo").text("Edit Good Receipt " + goodReceiptNo);
+    var accPayableNo = value[0];
+    console.log(accPayableNo);
+    $("#lblAccPayableNo").text("Proceed Acc Payable " + accPayableNo);
     
     $.ajax({
         type: "POST",
-        url: "../goodreceiptexec/get_good_receipt_line",
+        url: "../accpayableexec/get_acc_payable_line",
         data: {
-            goodReceiptNo: goodReceiptNo
+            accPayableNo: accPayableNo
         },
         success: function(data){
             // console.log(data.data[0].brand_id);
@@ -166,37 +166,37 @@ function editGoodReceipt(value) {
 
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].good_receipt_qty * data.data[i].good_receipt_price;
+                var subTotal = data.data[i].acc_payable_qty * data.data[i].acc_payable_price;
 
                 // 2. memasukkan sales quote line ke dalam bentuk array (untuk simpan data)
                 // init object
-                var goodReceiptLineitem = {
-                    goodReceiptLineId: data.data[i].item_id,
-                    goodReceiptLinePrice: data.data[i].good_receipt_price,
-                    goodReceiptLineQty: data.data[i].good_receipt_qty,
-                    goodReceiptLineKet: data.data[i].keterangan
+                var accPayableLineitem = {
+                    accPayableLineId: data.data[i].item_id,
+                    accPayableLinePrice: data.data[i].acc_payable_price,
+                    accPayableLineQty: data.data[i].acc_payable_qty,
+                    accPayableLineKet: data.data[i].keterangan
                 };
-                goodReceiptLine.push(goodReceiptLineitem);
+                accPayableLine.push(accPayableLineitem);
             }
             
-            console.log(goodReceiptLine);
+            console.log(accPayableLine);
             
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].good_receipt_qty * data.data[i].good_receipt_price;
+                var subTotal = data.data[i].acc_payable_qty * data.data[i].acc_payable_price;
 
                 // 1. memasukkan sales quote line ke dalam bentuk html (untuk tampilan)
                 content +="<tr><td style='line-height:2.6;' id='lblIdItemEditLine"+ counter +"'>" + counter + "</td>";
-                content +="<td style='line-height:2.6;' class='goodReceiptForRemove'  id='lblItemIdEditLine"+ counter +"'>" + data.data[i].item_id + "</td>";
+                content +="<td style='line-height:2.6;' class='accPayableForRemove'  id='lblItemIdEditLine"+ counter +"'>" + data.data[i].item_id + "</td>";
                 content +="<td style='line-height:2.6;' id='lblItemNameEditLine"+ counter +"'>" + data.data[i].item_name + "</td>";
-                content +="<td><input type='text' id='txtItemQtyEditLine"+ counter +"' class='form-control' value='" + data.data[i].good_receipt_qty + "' onfocusout='editGoodReceiptLine("+counter+")'/></td>";
-                content +="<td><input type='text' id='txtItemPriceEditLine"+ counter +"' class='form-control' value='" + accounting.formatMoney(data.data[i].good_receipt_price, "Rp. ", 2, ".", ",") + "' data-a-sign='Rp. ' data-a-dec=',' data-a-sep='.' onfocusout='editGoodReceiptLine("+counter+")'/></td>";
+                content +="<td><input type='text' id='txtItemQtyEditLine"+ counter +"' class='form-control' value='" + data.data[i].acc_payable_qty + "' onfocusout='editAccPayableLine("+counter+")'/></td>";
+                content +="<td><input type='text' id='txtItemPriceEditLine"+ counter +"' class='form-control' value='" + accounting.formatMoney(data.data[i].acc_payable_price, "Rp. ", 2, ".", ",") + "' data-a-sign='Rp. ' data-a-dec=',' data-a-sep='.' onfocusout='editAccPayableLine("+counter+")'/></td>";
                 content +="<td id='lblSubTotalEditLine"+ counter +"' style='line-height:2.6;'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
-                content +="<td><textarea id='txtItemKetLine"+ counter +"' class='form-control' onfocusout='editGoodReceiptLine("+counter+")'>" + data.data[i].keterangan + "</textarea></td>";
-                content +="<td align='center' style='line-height:2.6;'><button type='button' class='btnRemoveGoodReceiptLine btn btn-link'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td></tr>";
+                content +="<td><textarea id='txtItemKetLine"+ counter +"' class='form-control' onfocusout='editAccPayableLine("+counter+")'>" + data.data[i].keterangan + "</textarea></td>";
+                content +="<td align='center' style='line-height:2.6;'><button type='button' class='btnRemoveAccPayableLine btn btn-link'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td></tr>";
             }
 
-            $('#tableEditGoodReceipt').append(content);
+            $('#tableEditAccPayable').append(content);
 
             for(var i=0;i<data.data.length;i++) {
                 var counter = i+1;
@@ -217,18 +217,18 @@ function editGoodReceipt(value) {
  * 
  * 
  */
-function proceedGoodReceipt(value) {
+function proceedAccPayable(value) {
     // console.log(value);
     clearTxtSuppAddId();
-    var goodReceiptNo = value[0];
+    var accPayableNo = value[0];
     var supplierId = value[2];
     var keterangan = value[3];
     var userId = $('#userIdLogin').val();
     console.log(supplierId);
     $('#txtSuppAddId').val(supplierId);
-    $("#tableProcessGoodReceipt tbody tr").remove(); 
+    $("#tableProcessAccPayable tbody tr").remove(); 
 
-    $("#lblProcessGoodReceiptNo").text("Process Good Receipt " + goodReceiptNo);
+    $("#lblProcessAccPayableNo").text("Proceed Acc Payable " + accPayableNo);
     // $('#txtCustAddId').val(supplierAddId);
 
     /*$.ajax({
@@ -249,9 +249,9 @@ function proceedGoodReceipt(value) {
     
     $.ajax({
         type: "POST",
-        url: "../goodreceiptexec/get_good_receipt_line",
+        url: "../accpayableexec/get_acc_payable_line",
         data: {
-            goodReceiptNo: goodReceiptNo
+            accPayableNo: accPayableNo
         },
         success: function(data){
             // console.log(data);
@@ -260,24 +260,24 @@ function proceedGoodReceipt(value) {
 
             for(var i=0;i<data.count;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].good_receipt_qty * data.data[i].good_receipt_price;
+                var subTotal = data.data[i].acc_payable_qty * data.data[i].acc_payable_price;
 
                 // 2. memasukkan sales order line ke dalam bentuk array (untuk simpan data)
                 // init object
-                var goodReceiptLineitem = {
-                    goodReceiptLineId: data.data[i].item_id,
-                    goodReceiptLinePrice: data.data[i].good_receipt_price,
-                    goodReceiptLineQty: data.data[i].good_receipt_qty,
-                    goodReceiptLineKet: data.data[i].keterangan
+                var accPayableLineitem = {
+                    accPayableLineId: data.data[i].item_id,
+                    accPayableLinePrice: data.data[i].acc_payable_price,
+                    accPayableLineQty: data.data[i].acc_payable_qty,
+                    accPayableLineKet: data.data[i].keterangan
                 };
-                goodReceiptLine.push(goodReceiptLineitem);
+                accPayableLine.push(accPayableLineitem);
             }
 
-            goodReceipt = {
-                goodReceiptNo: goodReceiptNo,
+            accPayable = {
+                accPayableNo: accPayableNo,
                 supplierId: supplierId,
                 keterangan: keterangan,
-                goodReceiptLine: goodReceiptLine,
+                accPayableLine: accPayableLine,
                 userId: userId
             }
             
@@ -285,19 +285,19 @@ function proceedGoodReceipt(value) {
             
             for(var i=0;i<data.count;i++) {
                 var counter = i+1;                
-                var subTotal = data.data[i].good_receipt_qty * data.data[i].good_receipt_price;
+                var subTotal = data.data[i].acc_payable_qty * data.data[i].acc_payable_price;
 
                 // 1. memasukkan sales quote line ke dalam bentuk html (untuk tampilan)
                 content_process +="<tr><td style='line-height:2.6;' id='lblIdItemProcessLine"+ counter +"'>" + counter + "</td>";
-                content_process +="<td style='line-height:2.6;' class='goodReceiptForRemove'  id='lblItemIdProcessLine"+ counter +"'>" + data.data[i].item_id + "</td>";
+                content_process +="<td style='line-height:2.6;' class='accPayableForRemove'  id='lblItemIdProcessLine"+ counter +"'>" + data.data[i].item_id + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemNameProcessLine"+ counter +"'>" + data.data[i].item_name + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].good_receipt_qty + "</td>";
-                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].good_receipt_price, "Rp. ", 2, ".", ",") + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemQtyProcessLine"+ counter +"'>" + data.data[i].acc_payable_qty + "</td>";
+                content_process +="<td style='line-height:2.6;' id='lblItemPriceProcessLine"+ counter +"' align='right'>" + accounting.formatMoney(data.data[i].acc_payable_price, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblSubTotalEditLine"+ counter +"' align='right'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemKeteranganProcessLine"+ counter +"'>" + data.data[i].keterangan + "</td>";
             }
 
-            $('#tableProcessGoodReceipt').append(content_process);
+            $('#tableProcessAccPayable').append(content_process);
             // end here
         },
         error: function(data){
@@ -310,41 +310,41 @@ function proceedGoodReceipt(value) {
  * Function untuk memproses GR menjadi AP
  * 
  */
-function proceedGrToAp() {
-    var goodReceiptNo = $("#lblProcessGoodReceiptNo").text().substring(21, 31);
+function proceedAp() {
+    var accPayableNo = $("#lblProcessAccPayableNo").text().substring(20, 30);
     // var supplierId = $("#txtSuppAddId").val().substring(0, 10);
     // var customerId = salesQuoteLine[0].customerId;
-    var supplierId = goodReceipt.supplierId;
-    var keterangan = goodReceipt.keterangan;
-    console.log(goodReceiptNo);
+    var supplierId = accPayable.supplierId;
+    var keterangan = accPayable.keterangan;
+    console.log(accPayableNo);
     // var custAddId = $('#txtSuppAddId').val();
     // console.log($("#lblSalesQuoteNo").text().substring(20, 30));
     // console.log(salesQuoteLine);
     // console.log(customerId);
     // console.log(custAddId);
 
-    var updateRecord = confirm("Yakin Good Receipt " + goodReceiptNo + " diproses menjadi Account Payable?");
+    var updateRecord = confirm("Yakin Account Payable " + accPayableNo + " diproses menjadi selesai?");
 
     if(updateRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../goodreceiptexec/proceed_good_receipt",
+            url: "../accpayableexec/proceed_acc_payable",
             data: {
-                goodReceiptNo: goodReceiptNo,
+                accPayableNo: accPayableNo,
                 supplierId: supplierId,
                 keterangan: keterangan,
-                goodReceiptLine: goodReceiptLine,
+                accPayableLine: accPayableLine,
                 updatedBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                window.location.href = '../goodreceipt/manage';
+                window.location.href = '../accpayable/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '../goodreceipt/manage';
+                window.location.href = '../accpayable/manage';
             }
         });
     }
@@ -355,10 +355,10 @@ function proceedGrToAp() {
  * 
  * 
  */
-$(document).on('click', 'button.btnRemoveGoodReceiptLine', function () {
-    var itemId = $(this).closest('tr').find('.goodReceiptForRemove').text();
+$(document).on('click', 'button.btnRemoveAccPayableLine', function () {
+    var itemId = $(this).closest('tr').find('.accPayableForRemove').text();
     // console.log(itemId);
-    removeGoodReceiptLine(itemId);
+    removeAccPayableLine(itemId);
      
     $(this).closest('tr').remove();
     return false;
@@ -369,57 +369,57 @@ $(document).on('click', 'button.btnRemoveGoodReceiptLine', function () {
  * 
  * 
  */
-function deleteGoodReceipt(value) {
+function deleteAccPayable(value) {
     // console.log(value);
 
-    var deleteRecord = confirm("Yakin hapus data Good Receipt " + value[0] + " dari database?");
+    var deleteRecord = confirm("Yakin hapus data Acc Payable " + value[0] + " dari database?");
 
     if(deleteRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../goodreceiptexec/delete_good_receipt",
+            url: "../accpayableexec/delete_acc_payable",
             data: {
-                goodReceiptNo: value[0],
-                goodReceiptCust: value[2],
+                accPayableNo: value[0],
+                accPayableCust: value[2],
                 createdBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL DELETE USER");
                 alert(resp.message);
-                window.location.href = '/goodreceipt/manage';
+                window.location.href = '/accpayable/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '/goodreceipt/manage';
+                window.location.href = '/accpayable/manage';
             }
         });
     }
 };
 
-function updateGoodReceipt() {
-    var goodReceiptNo = $("#lblGoodReceiptNo").text().substring(18, 28);
+function updateAccPayable() {
+    var accPayableNo = $("#lblAccPayableNo").text().substring(20, 30);
     // console.log($("#lblSalesQuoteNo").text().substring(17, 27));
-    var updateRecord = confirm("Yakin update data Good Receipt " + goodReceiptNo + "?");
+    var updateRecord = confirm("Yakin update data Acc Payable " + accPayableNo + "?");
 
     if(updateRecord == true) {
         $.ajax({
             type: "POST",
-            url: "../goodreceiptexec/update_good_receipt",
+            url: "../accpayableexec/update_acc_payable",
             data: {
-                goodReceiptNo: goodReceiptNo,
-                goodReceiptLine: goodReceiptLine,
+                accPayableNo: accPayableNo,
+                accPayableLine: accPayableLine,
                 updatedBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                window.location.href = '../goodreceipt/manage';
+                window.location.href = '../accpayable/manage';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '../goodreceipt/manage';
+                window.location.href = '../accpayable/manage';
             }
         });
     }
@@ -486,36 +486,36 @@ $(document).on('click', 'button.btnRemove', function () {
     return false;
 });
 
-function editGoodReceiptLine(paramIdItemTable) {
-    hitungSubTotalGoodReceiptLine(paramIdItemTable);
+function editAccPayableLine(paramIdItemTable) {
+    hitungSubTotalAccPayableLine(paramIdItemTable);
     // console.log(cart[paramIdItemTable - 1].itemLineId);
     // console.log($('#lblItemIdLine' + paramIdItemTable).text());
     // console.log(salesQuoteLine);
-    if (goodReceiptLine.filter(e => e.goodReceiptLineId === $('#lblItemIdEditLine' + paramIdItemTable).text()).length > -1) {
+    if (accPayableLine.filter(e => e.accPayableLineId === $('#lblItemIdEditLine' + paramIdItemTable).text()).length > -1) {
         // console.log("BARANG SUDAH ADA");
-        var index = goodReceiptLine.findIndex(x => x.goodReceiptLineId == $('#lblItemIdEditLine' + paramIdItemTable).text());
+        var index = accPayableLine.findIndex(x => x.accPayableLineId == $('#lblItemIdEditLine' + paramIdItemTable).text());
         // console.log(index);
         
         if(index > -1) {
             // remove element yg lama
-            goodReceiptLine.splice(index, 1);
+            accPayableLine.splice(index, 1);
 
             // tambahkan itemLine yg sudah di edit ke dalam array
-            goodReceiptItemId = $('#lblItemIdEditLine' + paramIdItemTable).text();
-            goodReceiptItemPrice = $('#txtItemPriceEditLine'  + paramIdItemTable).autoNumeric('get');
-            goodReceiptItemQty = $('#txtItemQtyEditLine' + paramIdItemTable).val();
-            goodReceiptItemKet = $('#txtItemKetLine' + paramIdItemTable).val();
+            accPayableItemId = $('#lblItemIdEditLine' + paramIdItemTable).text();
+            accPayableItemPrice = $('#txtItemPriceEditLine'  + paramIdItemTable).autoNumeric('get');
+            accPayableItemQty = $('#txtItemQtyEditLine' + paramIdItemTable).val();
+            accPayableItemKet = $('#txtItemKetLine' + paramIdItemTable).val();
 
             // init object
-            var goodReceiptItemLine = {
-                goodReceiptLineId: goodReceiptItemId,
-                goodReceiptLinePrice: goodReceiptItemPrice,
-                goodReceiptLineQty: goodReceiptItemQty,
-                goodReceiptLineKet: goodReceiptItemKet
+            var accPayableItemLine = {
+                accPayableLineId: accPayableItemId,
+                accPayableLinePrice: accPayableItemPrice,
+                accPayableLineQty: accPayableItemQty,
+                accPayableLineKet: accPayableItemKet
             };
 
-            goodReceiptLine.push(goodReceiptItemLine);
-            console.log(goodReceiptLine);
+            accPayableLine.push(accPayableItemLine);
+            console.log(accPayableLine);
         }
     }
 }
@@ -568,18 +568,18 @@ function removeItemLine(paramItemId) {
     }
 }
 
-function removeGoodReceiptLine(paramItemId) {
+function removeAccPayableLine(paramItemId) {
     console.log(paramItemId);
-    if (goodReceiptLine.filter(e => e.goodReceiptLineId === paramItemId).length > -1) {
+    if (accPayableLine.filter(e => e.accPayableLineId === paramItemId).length > -1) {
         // console.log("BARANG SUDAH ADA");
-        var index = goodReceiptLine.findIndex(x => x.goodReceiptLineId == paramItemId);
+        var index = accPayableLine.findIndex(x => x.accPayableLineId == paramItemId);
         console.log(index);
 
         if(index > -1) {
             // remove element yg lama
-            goodReceiptLine.splice(index, 1);
+            accPayableLine.splice(index, 1);
         }
-        console.log(goodReceiptLine);
+        console.log(accPayableLine);
     }
 }
 
@@ -591,7 +591,7 @@ function hitungSubTotal(paramIdItemTable) {
     $('#lblSubTotal' + (paramIdItemTable)).html(accounting.formatMoney(subTotalPerLine, "Rp. ", 2, ".", ","));
 }
 
-function hitungSubTotalGoodReceiptLine(paramIdItemTable) {
+function hitungSubTotalAccPayableLine(paramIdItemTable) {
     var subTotalSalesQuote = $('#txtItemQtyEditLine' + (paramIdItemTable)).val() * accounting.unformat($('#txtItemPriceEditLine' + (paramIdItemTable)).val(), ",");
     $('#lblSubTotalEditLine' + (paramIdItemTable)).html(accounting.formatMoney(subTotalSalesQuote, "Rp. ", 2, ".", ","));
 }
@@ -627,12 +627,12 @@ function createNewSalesQuote() {
         success: function(resp) {
             // alert("SUKSES BUAT USER BARU");
             alert(resp.message);
-            window.location.href = '/salesquote/manage';
+            window.location.href = '/accpayable/manage';
         },
         error: function(resp) {
             // alert("something went wrong");
             alert('Error: ', resp.message);
-            window.location.href = '/salesquote/manage';
+            window.location.href = '/accpayable/manage';
         }
     }); 
 }

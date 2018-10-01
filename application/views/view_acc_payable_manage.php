@@ -1,4 +1,4 @@
-<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/backoffice/good_receipt.js"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/backoffice/acc_payable.js"></script>
 
 <div class="row">
     <div class="col-xs-12">
@@ -10,9 +10,9 @@
         <?php
             if($userlevel->user_level_id == 1) {
         ?>
-        <!--<button type="button" class="btn btn-lg" onclick="window.location.href='/goodreceipt/add'">
+        <!--<button type="button" class="btn btn-lg" onclick="window.location.href='/accpayable/add'">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            Create New Good Receipt
+            Create New Acc Payable
         </button>-->
         <?php
             }
@@ -29,13 +29,13 @@
 <div class="row">
     <div class="col-xs-12">
         <input type="hidden" id="userIdLogin" value="<?php echo $name->user_id; ?>">
-        <table id="tableGoodReceipt" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
+        <table id="tableAccPayable" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
             <thead>
                 <tr>
                     <th></th>
-                    <th>Good Receipt No</th>
+                    <th>Acc Payable No</th>
                     <!-- <th>user_level_id</th> -->
-                    <th>Good Receipt Date</th>
+                    <th>Acc Payable Date</th>
                     <th>Supplier</th>
                     <!-- <th>Kirim Ke</th> -->
                     <!-- <th>Password</th> -->
@@ -56,13 +56,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="lblGoodReceiptNo">Edit Good Receipt</h4>
+                <h4 class="modal-title" id="lblAccPayableNo">Edit Acc Payable</h4>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="userIdLogin" value="<?php echo $name->user_id; ?>"> <!-- userId yang login -->
                 <input type="hidden" id="idItem"> <!-- itemId record yg hendak di edit -->
                 
-                <table id="tableEditGoodReceipt" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
+                <table id="tableEditAccPayable" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
                     <thead>
                         <tr>
                             <th width="1%"></th>
@@ -86,7 +86,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="updateGoodReceipt" onclick="updateGoodReceipt()">Save changes</button>
+                <button type="button" class="btn btn-primary" id="updateAccPayable" onclick="updateAccPayable()">Save changes</button>
             </div>
         </div>
     </div>
@@ -98,7 +98,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="lblProcessGoodReceiptNo">Process Good Receipt</h4>
+                <h4 class="modal-title" id="lblProcessAccPayableNo">Process Acc Payable</h4>
             </div>
             <div class="modal-body">
                 <div class="row" style="margin-bottom:10px;">
@@ -106,10 +106,10 @@
                         <label for="lblSuppAddId">Supplier Address:</label>
                     </div>
                     <div class="col-xs-9">
-                        <input type="text" class="form-control" id="txtSuppAddId" onfocusout="enableButtonProceedGoodReceipt()" placeholder="Supplier Address ID">
+                        <input type="text" class="form-control" id="txtSuppAddId" onfocusout="enableButtonProceedAccPayable()" placeholder="Supplier Address ID">
                     </div>
                 </div>
-                <table id="tableProcessGoodReceipt" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
+                <table id="tableProcessAccPayable" class="table table-striped table-bordered table-hover dt-responsive nowrap" cellspacing="0" width="100%">
                     <thead>
                         <tr>
                             <th width="1%"></th>
@@ -132,7 +132,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="btnProceedGoodReceipt" onclick="proceedGrToAp()">Proceed Good Receipt</button>
+                <button type="button" class="btn btn-primary" id="btnProceedAccPayable" onclick="proceedAp()">Proceed Acc Payable</button>
             </div>
         </div>
     </div>
