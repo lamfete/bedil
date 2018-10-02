@@ -267,8 +267,8 @@ function proceedInvoice(value) {
                 // init object
                 var salesInvoiceLineitem = {
                     salesInvoiceLineId: data.data[i].item_id,
-                    salesInvoiceLinePrice: data.data[i].sales_shipper_price,
-                    salesInvoiceLineQty: data.data[i].sales_shipper_qty,
+                    salesInvoiceLinePrice: data.data[i].sales_invoice_price,
+                    salesInvoiceLineQty: data.data[i].sales_invoice_qty,
                     salesInvoiceLineKet: data.data[i].keterangan
                 };
                 salesInvoiceLine.push(salesInvoiceLineitem);
@@ -297,7 +297,7 @@ function proceedInvoice(value) {
                 content_process +="<td style='line-height:2.6;' id='lblSubTotalEditLine"+ counter +"' align='right'>" + accounting.formatMoney(subTotal, "Rp. ", 2, ".", ",") + "</td>";
                 content_process +="<td style='line-height:2.6;' id='lblItemKeteranganProcessLine"+ counter +"'>" + data.data[i].keterangan + "</td>";
             }
-
+            
             $('#tableProcessSalesInvoice').append(content_process);
             // end here
         },
@@ -320,7 +320,7 @@ function proceedInvoiceToFinish() {
 
     // var custAddId = $('#txtCustAddId').val();
     // console.log($("#lblSalesQuoteNo").text().substring(20, 30));
-    // console.log(salesQuoteLine);
+    // console.log(salesInvoiceLine);
     // console.log(customerId);
     // console.log(custAddId);
 

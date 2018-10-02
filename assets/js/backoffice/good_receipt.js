@@ -316,7 +316,7 @@ function proceedGrToAp() {
     // var customerId = salesQuoteLine[0].customerId;
     var supplierId = goodReceipt.supplierId;
     var keterangan = goodReceipt.keterangan;
-    console.log(goodReceiptNo);
+    
     // var custAddId = $('#txtSuppAddId').val();
     // console.log($("#lblSalesQuoteNo").text().substring(20, 30));
     // console.log(salesQuoteLine);

@@ -5,6 +5,7 @@ class M_invoice extends CI_Model {
 
     public function __construct() {
         parent::__construct();
+        $this->load->model('m_kartustok');
     }
 
     public function get_all_invoice($type, $input) {
@@ -293,6 +294,50 @@ class M_invoice extends CI_Model {
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
+
+        // start of kartu stok
+        for($i=0;$i<count($param['salesInvoiceLine']);$i++) {
+            $q2 = "
+                select s_akhir_jumlah, s_akhir_harga, s_akhir_total 
+                from kartu_stok 
+                where item_id = '" . $param['salesInvoiceLine'][$i]['salesInvoiceLineId'] . "'
+                order by kartu_stok_id desc 
+                limit 0,1;
+            ";
+
+            $num_rows = $this->db->query($q2)->num_rows();
+            // var_dump($num_rows);exit;
+            if($num_rows < 1) {
+                $s_akhir_jumlah = 0;
+                $s_akhir_harga = 0;
+                $s_akhir_total = 0;
+            }
+            else {
+                $s_akhir_jumlah = $this->db->query($q2)->result_array()[0]['s_akhir_jumlah'];
+                $s_akhir_harga = $this->db->query($q2)->result_array()[0]['s_akhir_harga'];
+                $s_akhir_total = $this->db->query($q2)->result_array()[0]['s_akhir_total'];
+            }
+
+            $data = array(
+                'tanggal_transaksi' => date("Y-m-d H:i:s"),
+                // 'acc_payable_no' => $acc_payable_no,
+                'item_id' => $param['salesInvoiceLine'][$i]['salesInvoiceLineId'],
+                's_awal_jumlah' => $s_akhir_jumlah,
+                's_awal_harga' => $s_akhir_harga,
+                's_awal_total' => $s_akhir_total,
+                'jual_jumlah' => $param['salesInvoiceLine'][$i]['salesInvoiceLineQty'],
+                'jual_harga' => $param['salesInvoiceLine'][$i]['salesInvoiceLinePrice'],
+                'jual_total' => $param['salesInvoiceLine'][$i]['salesInvoiceLineQty'] * $param['salesInvoiceLine'][$i]['salesInvoiceLinePrice'],
+                // 'acc_payable_line_status' => 'OPEN',
+                'keterangan' => $param['salesInvoiceLine'][$i]['salesInvoiceLineKet'],
+                'created_at' => date("Y-m-d H:i:s"),
+                'created_by' => $param['updatedBy']
+            );
+        
+            // $this->db->insert('kartu_stok', $data);
+            $this->m_kartustok->insert_jual_kartu_stok($data);
+        }
+        // end of kartu stok
 
         $this->db->insert('user_log', $log); 
         $this->db->trans_complete();       

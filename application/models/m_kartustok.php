@@ -1,11 +1,10 @@
 <?php
 if(!defined('BASEPATH')) exit('Hacking Attempt');
 
-class M_accpayable extends CI_Model {
+class M_kartustok extends CI_Model {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('m_kartustok');
     }
 
     public function get_all_acc_payable($type, $input) {
@@ -112,24 +111,32 @@ class M_accpayable extends CI_Model {
         return $result;
     }
 
-    public function set_new_sales_quote($param) {
+    public function insert_beli_kartu_stok($param) {
         $result = new \stdClass();
-
-        if(count($param['shopping_cart']) > 0) {
+        // var_dump($param);
+        if(count($param) > 0) {
             // var_dump($param[0]['itemLineId']);
             
-            // insert into sales_quote_head
-            $sales_quote_head = array(
-                'sales_quote_date' => date("Y-m-d H:i:s"),
-                'supplier_id' => $param['supplier_id'],
-                'sales_quote_status' => 'OPEN',
+            // insert into kartu_stok
+            $kartu_stok = array(
+                'tanggal_transaksi' => $param['tanggal_transaksi'],
+                'item_id' => $param['item_id'],
+                's_awal_jumlah' => $param['s_awal_jumlah'],
+                's_awal_harga' => $param['s_awal_harga'],
+                's_awal_total' => $param['s_awal_total'],
+                'beli_jumlah' => $param['beli_jumlah'],
+                'beli_harga' => $param['beli_harga'],
+                'beli_total' => $param['beli_total'],
+                's_akhir_jumlah' => $param['s_awal_jumlah'] + $param['beli_jumlah'],
+                's_akhir_harga' => $param['beli_harga'],
+                's_akhir_total' => ($param['s_awal_jumlah'] + $param['beli_jumlah']) * $param['beli_harga'],
                 'keterangan' => $param['keterangan'],
-                'created_at' => date("Y-m-d H:i:s"),
-                'created_by' => $param['user_id']
+                'created_at' => $param['created_at'],
+                'created_by' => $param['created_by']
             );
 
             $this->db->trans_start();
-            $q1 = $this->db->insert('sales_quote_head', $sales_quote_head);
+            $q1 = $this->db->insert('kartu_stok', $kartu_stok);
 
             /*$this->db->select('sales_quote_date');
             $this->db->from('sales_quote_head');
@@ -138,38 +145,12 @@ class M_accpayable extends CI_Model {
 
             $sales_quote_no = $this->db->get();*/
             // print_r($sales_quote_no->result_array());
-            $q2 = "
-                select sales_quote_no 
-                from sales_quote_head 
-                order by sales_quote_date desc 
-                limit 0,1;
-            ";
-
-            $sales_quote_no = $this->db->query($q2)->result_array()[0]['sales_quote_no'];
             // var_dump($sales_quote_no[0]['sales_quote_no']);
 
-            for($i=0;$i<count($param['shopping_cart']);$i++) {
-                // insert into sales_quote_line
-                $sales_quote_line = array(
-                    'sales_quote_no' => $sales_quote_no,
-                    'item_id' => $param['shopping_cart'][$i]['itemLineId'],
-                    'sales_quote_qty' => $param['shopping_cart'][$i]['itemLineQty'],
-                    'sales_quote_price' => $param['shopping_cart'][$i]['itemLinePrice'],
-                    'sales_quote_line_status' => 'OPEN',
-                    'keterangan' => $param['shopping_cart'][$i]['itemLineKet'],
-                    'created_at' => date("Y-m-d H:i:s"),
-                    'created_by' => $param['user_id']
-                );
-
-                // $q1 = $this->db->insert('sales_quote_head', $sales_quote_head);
-                
-                $q3 = $this->db->insert('sales_quote_line', $sales_quote_line);
-            }
-
             $log = array(
-                'tindakan' => $_SESSION['username'] . " CREATE NEW SALES QUOTE NO " . $sales_quote_no,
+                'tindakan' => $_SESSION['username'] . " CREATE NEW RECORD KARTU STOK",
                 'created_at' => date("Y-m-d H:i:s"),
-                'created_by' => $param['user_id']
+                'created_by' => $param['created_by']
             );
             $q4 = $this->db->insert('user_log', $log);
             $this->db->trans_complete();
@@ -189,9 +170,69 @@ class M_accpayable extends CI_Model {
         }
         else {
             $result->message = "no sales quote data.";
-        }
+        }   
+    }
 
-        
+    public function insert_jual_kartu_stok($param) {
+        $result = new \stdClass();
+        // var_dump($param);
+        if(count($param) > 0) {
+            // var_dump($param[0]['itemLineId']);
+            
+            // insert into kartu_stok
+            $kartu_stok = array(
+                'tanggal_transaksi' => $param['tanggal_transaksi'],
+                'item_id' => $param['item_id'],
+                's_awal_jumlah' => $param['s_awal_jumlah'],
+                's_awal_harga' => $param['s_awal_harga'],
+                's_awal_total' => $param['s_awal_total'],
+                'jual_jumlah' => $param['jual_jumlah'],
+                'jual_harga' => $param['jual_harga'],
+                'jual_total' => $param['jual_total'],
+                's_akhir_jumlah' => $param['s_awal_jumlah'] + $param['jual_jumlah'],
+                's_akhir_harga' => $param['jual_harga'],
+                's_akhir_total' => ($param['s_awal_jumlah'] + $param['jual_jumlah']) * $param['jual_harga'],
+                'keterangan' => $param['keterangan'],
+                'created_at' => $param['created_at'],
+                'created_by' => $param['created_by']
+            );
+
+            $this->db->trans_start();
+            $q1 = $this->db->insert('kartu_stok', $kartu_stok);
+
+            /*$this->db->select('sales_quote_date');
+            $this->db->from('sales_quote_head');
+            $this->db->order_by('sales_quote_date', 'DESC');
+            $this->db->limit(0, 1);
+
+            $sales_quote_no = $this->db->get();*/
+            // print_r($sales_quote_no->result_array());
+            // var_dump($sales_quote_no[0]['sales_quote_no']);
+
+            $log = array(
+                'tindakan' => $_SESSION['username'] . " CREATE NEW RECORD KARTU STOK",
+                'created_at' => date("Y-m-d H:i:s"),
+                'created_by' => $param['created_by']
+            );
+            $q4 = $this->db->insert('user_log', $log);
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                $result->message = "Something went wrong";
+                // $result->error = $this->db->error();
+                $result->error = $this->db->_error_message();
+                return $result;
+            }
+            else {
+                $this->db->trans_commit();
+                $result->message = "Successfully create new sales quote";
+                return $result;
+            }
+        }
+        else {
+            $result->message = "no sales quote data.";
+        }   
     }
 
     public function delete_acc_payable($param) {
@@ -296,62 +337,33 @@ class M_accpayable extends CI_Model {
         $this->db->update('acc_payable_head', $acc_payable_update);
 
         $q2 = "
-                select acc_payable_no 
-                from acc_payable_head 
-                order by acc_payable_no desc 
-                limit 0,1;
-            ";
-
-        $log = array(
-            'tindakan' => $_SESSION['username'] . " MEMPROSES AP NO " . $param['salesInvoiceNo'] . " MENJADI PAID.",
-            'created_at' => date("Y-m-d H:i:s"),
-            'created_by' => $param['updatedBy']
-        );
-
-        // start of kartu stok
-        for($i=0;$i<count($param['accPayableLine']);$i++) {
-            $q2 = "
                 select s_akhir_jumlah, s_akhir_harga, s_akhir_total 
                 from kartu_stok 
-                where item_id = '" . $param['accPayableLine'][$i]['accPayableLineId'] . "'
                 order by kartu_stok_id desc 
                 limit 0,1;
             ";
 
-            $num_rows = $this->db->query($q2)->num_rows();
-            // var_dump($num_rows);exit;
-            if($num_rows < 1) {
-                $s_akhir_jumlah = 0;
-                $s_akhir_harga = 0;
-                $s_akhir_total = 0;
-            }
-            else {
-                $s_akhir_jumlah = $this->db->query($q2)->result_array()[0]['s_akhir_jumlah'];
-                $s_akhir_harga = $this->db->query($q2)->result_array()[0]['s_akhir_harga'];
-                $s_akhir_total = $this->db->query($q2)->result_array()[0]['s_akhir_total'];
-            }
-
+        $s_akhir_jumlah = $this->db->query($q2)->result_array()[0]['s_akhir_jumlah'];
+        $s_akhir_harga = $this->db->query($q2)->result_array()[0]['s_akhir_harga'];
+        $s_akhir_total = $this->db->query($q2)->result_array()[0]['s_akhir_total'];
+            // var_dump($sales_quote_no[0]['sales_quote_no']);
+        
+        for($i=0;$i<count($param['accPayableLine']);$i++) {
             $data = array(
                 'tanggal_transaksi' => date("Y-m-d H:i:s"),
                 // 'acc_payable_no' => $acc_payable_no,
-                'item_id' => $param['accPayableLine'][$i]['accPayableLineId'],
-                's_awal_jumlah' => $s_akhir_jumlah,
-                's_awal_harga' => $s_akhir_harga,
-                's_awal_total' => $s_akhir_total,
-                'beli_jumlah' => $param['accPayableLine'][$i]['accPayableLineQty'],
-                'beli_harga' => $param['accPayableLine'][$i]['accPayableLinePrice'],
-                'beli_total' => $param['accPayableLine'][$i]['accPayableLineQty'] * $param['accPayableLine'][$i]['accPayableLinePrice'],
-                // 'acc_payable_line_status' => 'OPEN',
-                'keterangan' => $param['accPayableLine'][$i]['accPayableLineKet'],
+                'item_id' => $param['goodReceiptLine'][$i]['goodReceiptLineId'],
+                'acc_payable_qty' => $param['goodReceiptLine'][$i]['goodReceiptLineQty'],
+                'acc_payable_price' => $param['goodReceiptLine'][$i]['goodReceiptLinePrice'],
+                'acc_payable_line_status' => 'OPEN',
+                'keterangan' => $param['goodReceiptLine'][$i]['goodReceiptLineKet'],
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['updatedBy']
             );
         
-            // $this->db->insert('kartu_stok', $data);
-            $this->m_kartustok->insert_beli_kartu_stok($data);
+            $this->db->insert('kartu_stok', $data);
+            $this->db->trans_complete();
         }
-        // end of kartu stok
-        $this->db->trans_complete();
 
         $log = array(
             'tindakan' => $_SESSION['username'] . " MEMPROSES ACC PAYABLE NO " . $param['accPayableNo'] . " MENJADI PAID.",
