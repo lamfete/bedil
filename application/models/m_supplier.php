@@ -63,6 +63,7 @@ class M_supplier extends CI_Model {
             $sql1 = "
                 select supplier_id, supplier_name, supplier_address_1, supplier_phone_1, supplier_bank_acc_1
                 from supplier
+                where supplier_status = 'AKTIF'
                 limit ".$input['start'].", ".$input['length'].";
             ";
             
@@ -71,7 +72,7 @@ class M_supplier extends CI_Model {
              * 
              */
             $sql2 = "
-                select * from supplier;
+                select * from supplier where supplier_status = 'AKTIF';
             ";
 
             $q1 = $this->db->query($sql1);
@@ -182,6 +183,12 @@ class M_supplier extends CI_Model {
             $this->db->where('email', $param);
 
             $result->message = "Looks like the email you entered already exist!";
+        } elseif($type == 'edit') {
+            $this->db->select('*');
+            $this->db->from('supplier');
+            $this->db->where('supplier_id', $param);
+
+            $result->message = "Looks like the request you entered doesn't exist!";
         }
 
         $query = $this->db->get();
@@ -252,17 +259,18 @@ class M_supplier extends CI_Model {
         }
     }
 
-    public function delete_user($param) {
+    public function delete_supplier($param) {
         $result = new \stdClass();
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " DELETE USER " . $param['userLogin'],
+            'tindakan' => $_SESSION['username'] . " DELETE SUPPLIER " . $param['supplierName'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['createdBy']
         );
 
         $this->db->trans_start();
-        $this->db->delete('user', array('user_id' => $param['userId']));
+        $this->db->where('supplier_id', $param['supplierId']);
+        $this->db->update('supplier', array('supplier_status' => 'INAKTIF'));
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -275,31 +283,37 @@ class M_supplier extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully delete user";
+            $result->message = "Successfully delete supplier";
             return $result;
         }
     }
 
-    public function update_user($param) {
+    public function update_supplier($param) {
         $result = new \stdClass();
         // var_dump($param);exit;
         $data = array(
-            'name' => $param['name'],
-            'email' => $param['email'],
-            'status' => $param['status'],
+            'supplier_name' => $param['supplierName'],
+            'supplier_address_1' => $param['supplierAdd1'],
+            'supplier_address_2' => $param['supplierAdd2'],
+            'supplier_phone_1' => $param['supplierPhone1'],
+            'supplier_phone_2' => $param['supplierPhone2'],
+            'supplier_email_1' => $param['supplierEmail1'],
+            'supplier_email_2' => $param['supplierEmail2'],
+            'supplier_bank_acc_1' => $param['supplierBankAcc1'],
+            'supplier_bank_acc_2' => $param['supplierBankAcc1'],
             'updated_at' => date("Y-m-d H:i:s"),
             'updated_by' => $param['updatedBy']
         );
 
         $log = array(
-            'tindakan' => $_SESSION['username'] . " UPDATE USER " . $param['userLogin'],
+            'tindakan' => $_SESSION['username'] . " UPDATE SUPPLIER " . $param['supplierName'],
             'created_at' => date("Y-m-d H:i:s"),
             'created_by' => $param['updatedBy']
         );
 
         $this->db->trans_start();
-        $this->db->where('user_id', $param['userId']);
-        $this->db->update('user', $data);
+        $this->db->where('supplier_id', $param['supplierId']);
+        $this->db->update('supplier', $data);
         $this->db->insert('user_log', $log);
         $this->db->trans_complete();
 
@@ -312,7 +326,7 @@ class M_supplier extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update user";
+            $result->message = "Successfully update supplier";
             return $result;
         }
     }

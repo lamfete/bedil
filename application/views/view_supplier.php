@@ -73,6 +73,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="userIdLogin" value="<?php echo $name->user_id; ?>"> <!-- userId yang login -->
+                <input type="hidden" id="supplierId">
                 <form>
                     <div class="form-group">
                         <label for="lblSupplierName">Supplier name</label>

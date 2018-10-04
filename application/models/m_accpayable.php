@@ -351,7 +351,6 @@ class M_accpayable extends CI_Model {
             $this->m_kartustok->insert_beli_kartu_stok($data);
         }
         // end of kartu stok
-        $this->db->trans_complete();
 
         $log = array(
             'tindakan' => $_SESSION['username'] . " MEMPROSES ACC PAYABLE NO " . $param['accPayableNo'] . " MENJADI PAID.",

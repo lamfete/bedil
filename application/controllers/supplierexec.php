@@ -52,6 +52,31 @@ class Supplierexec extends CI_Controller {
     }
 
     /*
+     * Function untuk mendapatkan data supplier
+     * 
+     * 
+     */
+    public function edit_supplier() {
+        // $data['all_user'] = new \stdClass();
+
+        if($this->session->userdata('isLogin') == FALSE) {
+            redirect('login/form');
+        } else {
+            $data['all_supplier'] = $this->m_supplier->get_supplier("edit", $_POST['idSupplier']);
+            // var_dump($data['all_user']);exit;
+            // echo json_encode($data['all_user']);
+
+            $this->output
+            ->set_status_header(200)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($data['all_supplier'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+            ->_display();
+
+            exit;
+        }
+    }
+
+    /*
      * Function untuk keperluan autocomplete jquery
      * 
      * 
@@ -164,17 +189,17 @@ class Supplierexec extends CI_Controller {
     }
 
     /*
-     * Function untuk delete user
+     * Function untuk delete supplier
      * 
      */
-    public function delete_user(){
+    public function delete_supplier(){
         // var_dump($_POST);
         $data = $_POST;
         
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
-            $result = $this->m_user->delete_user($data);
+            $result = $this->m_supplier->delete_supplier($data);
         }
 
         $this->output
@@ -187,17 +212,17 @@ class Supplierexec extends CI_Controller {
     }
 
     /*
-     * Function untuk update user
+     * Function untuk update supplier
      * 
      */
-    public function update_user(){
+    public function update_supplier(){
         // var_dump($_POST);
         $data = $_POST;
         
         if($this->session->userdata('isLogin') == FALSE) {
             redirect('login/form');
         } else {
-            $result = $this->m_user->update_user($data);
+            $result = $this->m_supplier->update_supplier($data);
         }
 
         $this->output

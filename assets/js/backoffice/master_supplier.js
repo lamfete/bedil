@@ -5,7 +5,7 @@ $(document).ready(function() {
      * 
      */
     $('#SupplierNameIsAlreadyTaken').hide();
-    $('#createNewSupplier').prop('disabled', true);
+    // $('#createNewSupplier').prop('disabled', true);
 
     // array untuk mengecek apakah semua field mandatory sudah diisi semua atau belum
     validation = [];
@@ -88,7 +88,7 @@ function clearCreateModalTextfield() {
     
     validation = [];
 
-    enableButtonCreateNewSupplier();    
+    // enableButtonCreateNewSupplier();    
 }
 
 /*
@@ -129,12 +129,12 @@ function createNewSupplier() {
         success: function(resp) {
             // alert("SUKSES BUAT USER BARU");
             alert(resp.message);
-            window.location.href = '/supplier';
+            // window.location.href = '/supplier';
         },
         error: function(resp) {
             // alert("something went wrong");
             alert('Error: ', resp.message);
-            window.location.href = '/supplier';
+            // window.location.href = '/supplier';
         }
     });
 }
@@ -155,7 +155,17 @@ function editSupplier(value) {
             idSupplier: idSupplier
         },
         success: function(resp) {
-            console.log(resp);
+            console.log(resp.data[0]);
+            $('#supplierId').val(resp.data[0].supplier_id);
+            $('#txtSupplierNameEdit').val(resp.data[0].supplier_name);
+            $('#txtAddress1Edit').val(resp.data[0].supplier_address_1);
+            $('#txtAddress2Edit').val(resp.data[0].supplier_address_2);
+            $('#txtPhone1Edit').val(resp.data[0].supplier_phone_1);
+            $('#txtPhone2Edit').val(resp.data[0].supplier_phone_2);
+            $('#txtEmail1Edit').val(resp.data[0].supplier_email_1);
+            $('#txtEmail2Edit').val(resp.data[0].supplier_email_2);
+            $('#txtBankAcc1Edit').val(resp.data[0].supplier_bank_acc_1);
+            $('#txtBankAcc2Edit').val(resp.data[0].supplier_bank_acc_2);
         },
         error: function(resp) {
             // alert("something went wrong");
@@ -165,33 +175,33 @@ function editSupplier(value) {
 };
 
 /*
- * function untuk delete user
+ * function untuk delete supplier
  * 
  * 
  */
-function deleteUser(value) {
-    // console.log(value[4]);
+function deleteSupplier(value) {
+    // console.log(value[1]);
 
-    var deleteRecord = confirm("Yakin hapus data user " + value[2] + " dari database?");
+    var deleteRecord = confirm("Yakin hapus data supplier " + value[1] + " dari database?");
 
     if(deleteRecord == true) {
         $.ajax({
             type: "POST",
-            url: "userexec/delete_user",
+            url: "supplierexec/delete_supplier",
             data: {
-                userId: value[0],
-                userLogin: value[2],
+                supplierId: value[0],
+                supplierName: value[1],
                 createdBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL DELETE USER");
                 alert(resp.message);
-                window.location.href = '/user';
+                window.location.href = '/supplier';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '/user';
+                window.location.href = '/supplier';
             }
         });
     }
@@ -204,24 +214,29 @@ function updateSupplier() {
     if(updateRecord == true) {
         $.ajax({
             type: "POST",
-            url: "userexec/update_user",
+            url: "supplierexec/update_supplier",
             data: {
-                userId: $('#idUser').val(),
-                userLogin: $('#txtUserloginEdit').val(),
-                name: $('#txtNameEdit').val(),
-                email: $('#txtEmailEdit').val(),
-                status: isaktif,
+                supplierId: $('#supplierId').val(),
+                supplierName: $('#txtSupplierNameEdit').val(),
+                supplierAdd1: $('#txtAddress1Edit').val(),
+                supplierAdd2:  $('#txtAddress2Edit').val(),
+                supplierPhone1: $('#txtPhone1Edit').val(),
+                supplierPhone2: $('#txtPhone2Edit').val(),
+                supplierEmail1: $('#txtEmail1Edit').val(),
+                supplierEmail2: $('#txtEmail2Edit').val(),
+                supplierBankAcc1: $('#txtBankAcc1Edit').val(),
+                supplierBankAcc2: $('#txtBankAcc2Edit').val(),
                 updatedBy: $('#userIdLogin').val()
             },
             success: function(resp) {
                 // alert("BERHASIL UPDATE USER");
                 alert(resp.message);
-                window.location.href = '/user';
+                window.location.href = '/supplier';
             },
             error: function(resp) {
                 // alert("something went wrong");
                 alert('Error: ', resp.message);
-                window.location.href = '/user';
+                window.location.href = '/supplier';
             }
         });
     }
@@ -274,7 +289,7 @@ function cekFormCreateNewSupplier(param) {
                         }
                         
                         console.log(validation);
-                        enableButtonCreateNewSupplier();
+                        // enableButtonCreateNewSupplier();
                     }
                 },
                 error: function(resp) {
