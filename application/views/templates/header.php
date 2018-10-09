@@ -136,6 +136,27 @@
                         </ul>
                     </li>
 
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Report<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                        <li><a href="/report/laststock">Last Stock</a></li>
+                        <li><a href="/report/omzetstock">Omzet Stock</a></li>
+                        <li><a href="/report/mutationstock">Mutation Stock</a></li>
+                        <li role="separator" class="divider"></li>
+                        <?php
+                            if($userlevel->user_level_id == 1) {
+                        ?>
+                        <li class="dropdown-header">List of</li>
+                        <li><a href="#">Link 1</a></li>
+                        <li><a href="#">Link 2</a></li>
+                        <li role="separator" class="divider"></li>
+                        <?php
+                            }
+                        ?>
+                        <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+
                     <li><a href="#contact">Contact</a></li>
                     <li><a href="<?php echo "/login/logout"; ?>">Logout</a></li>
                     </ul>

@@ -11,9 +11,27 @@ class M_user extends CI_Model {
         $result = new stdClass();
         $result_arr = array();
 
+        if($input['dir'] != "asc" && $input['dir'] != "desc") {
+            $input['dir'] = "asc";
+        }
+
+        $columns_valid = array(
+            "",
+            "u.user_id",
+            "u.user_login",
+            "u.name",
+            "u.email"
+        );
+
+        if(!isset($columns_valid[$input['col']])) {
+            $order = null;
+        } else {
+            $order = $columns_valid[$input['col']];
+        }
+
         if($type=="all") {
             // var_dump($input);exit;
-
+            
             /*
              * query untuk isi datatable
              * 
@@ -24,6 +42,7 @@ class M_user extends CI_Model {
                 from user u
                 left join user_level ul
                 on u.user_level_id = ul.user_level_id
+                order by ".$order." ".$input['dir']."
                 limit ".$input['start'].", ".$input['length'].";
             ";
             
@@ -49,6 +68,7 @@ class M_user extends CI_Model {
                 left join user_level ul
                 on u.user_level_id = ul.user_level_id
                 where u.user_login like '%".$input['search']."%'
+                order by ".$order." ".$input['dir']."
                 limit ".$input['start'].", ".$input['length'].";
             ";
 

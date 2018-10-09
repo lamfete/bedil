@@ -1,14 +1,14 @@
 <?php
 if(!defined('BASEPATH')) exit('Hacking Attempt');
 
-class M_accpayable extends CI_Model {
+class M_report extends CI_Model {
 
     public function __construct() {
         parent::__construct();
         $this->load->model('m_kartustok');
     }
 
-    public function get_all_acc_payable($type, $input) {
+    public function get_last_stock($type, $input) {
         $result = new stdClass();
         $result_arr = array();
 
@@ -21,8 +21,15 @@ class M_accpayable extends CI_Model {
              * 
              */
             $sql1 = "
-                select acc_payable_no, acc_payable_date, supplier_id, keterangan, acc_payable_status
-                from acc_payable_head 
+                select i.item_id, i.item_name,
+                (
+                    select ks.s_akhir_jumlah#, ks.s_akhir_harga, ks.s_akhir_total
+                    from kartu_stok ks
+                    where ks.item_id = i.item_id
+                    order by tanggal_transaksi desc, kartu_stok_id desc
+                    limit 0,1
+                ) stok_akhir
+                from item i
                 limit ".$input['start'].", ".$input['length'].";
             ";
             
@@ -31,7 +38,15 @@ class M_accpayable extends CI_Model {
              * 
              */
             $sql2 = "
-                select * from acc_payable_head;
+                select i.item_id, i.item_name,
+                (
+                    select ks.s_akhir_jumlah#, ks.s_akhir_harga, ks.s_akhir_total
+                    from kartu_stok ks
+                    where ks.item_id = i.item_id
+                    order by tanggal_transaksi desc, kartu_stok_id desc
+                    limit 0,1
+                ) stok_akhir
+                from item i;
             ";
 
             $q1 = $this->db->query($sql1);
@@ -43,11 +58,17 @@ class M_accpayable extends CI_Model {
             $num_rows = count($q2->result());
         } elseif($type=="search") {
             $sql1 = "
-            select acc_payable_no, acc_payable_date, supplier_id, keterangan, acc_payable_status
-                from acc_payable_head 
-                where acc_payable_no like '%".$input['search']."%'
-                or acc_payable_date like '%".$input['search']."%'
-                or acc_payable_status like '%".$input['search']."%'
+                select i.item_id, i.item_name,
+                (
+                    select ks.s_akhir_jumlah#, ks.s_akhir_harga, ks.s_akhir_total
+                    from kartu_stok ks
+                    where ks.item_id = i.item_id
+                    order by tanggal_transaksi desc, kartu_stok_id desc
+                    limit 0,1
+                ) stok_akhir
+                from item i
+                where i.item_id like '%".$input['search']."%'
+                or i.item_name like '%".$input['search']."%'
                 limit ".$input['start'].", ".$input['length'].";
             ";
 
@@ -72,11 +93,110 @@ class M_accpayable extends CI_Model {
                 array_push($col_arr, $value);
             }
             $implode = json_encode($col_arr);
-            array_push($col_arr, "
+            /*array_push($col_arr, "
                 <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editAccPayable(".$implode.")'>Edit</a>
                 <a class='btn btn-default' role='button' onclick='deleteAccPayable(".$implode.")'>Delete</a>
                 <a class='btn btn-default' role='button' data-toggle='modal' data-target='#processModal' onclick='proceedAccPayable(".$implode.")'>Process</a>
-            ");
+            ");*/
+            
+            array_push($result_arr, $col_arr);
+            unset($col_arr);
+        }
+        $result->data = $result_arr;
+        // var_dump($result);exit;
+        return $result;
+    }
+
+    public function get_omzet_stock($type, $input) {
+        $result = new stdClass();
+        $result_arr = array();
+
+        if($type=="all") {
+            // var_dump($input);exit;
+
+            /*
+             * query untuk isi datatable
+             * 
+             * 
+             */
+            $sql1 = "
+                select i.item_id, i.item_name,
+                (
+                    select ks.s_akhir_total
+                    from kartu_stok ks
+                    where ks.item_id = i.item_id
+                    order by tanggal_transaksi desc, kartu_stok_id desc
+                    limit 0,1
+                ) omzet_idr
+                from item i
+                limit ".$input['start'].", ".$input['length'].";
+            ";
+            
+            /*
+             * query untuk jumlah sales_quote_head
+             * 
+             */
+            $sql2 = "
+                select i.item_id, i.item_name,
+                (
+                    select ks.s_akhir_total
+                    from kartu_stok ks
+                    where ks.item_id = i.item_id
+                    order by tanggal_transaksi desc, kartu_stok_id desc
+                    limit 0,1
+                ) omzet_idr
+                from item i;
+            ";
+
+            $q1 = $this->db->query($sql1);
+            $q2 = $this->db->query($sql2);
+            // var_dump($query->result_array());exit;
+
+            // get item all item rows
+            $item_rows_count = count($q2->result());
+            $num_rows = count($q2->result());
+        } elseif($type=="search") {
+            $sql1 = "
+                select i.item_id, i.item_name,
+                (
+                    select ks.s_akhir_total
+                    from kartu_stok ks
+                    where ks.item_id = i.item_id
+                    order by tanggal_transaksi desc, kartu_stok_id desc
+                    limit 0,1
+                ) omzet_idr
+                from item i
+                where i.item_id like '%".$input['search']."%'
+                or i.item_name like '%".$input['search']."%'
+                limit ".$input['start'].", ".$input['length'].";
+            ";
+
+            $q1 = $this->db->query($sql1);
+            // var_dump($query->result_array());exit;
+
+            // get item all item rows
+            $item_rows_count = count($q1->result());
+            $num_rows = count($q1->result());
+        }
+        // var_dump($query->result_array());exit;
+
+        $result->draw = 1;
+        $result->recordsTotal = $num_rows;
+        $result->recordsFiltered = $num_rows;
+        // var_dump($query->result()[0]->user_login);exit;
+
+        for($i=0; $i<count($q1->result()); $i++) {
+            $col_arr = array();
+            
+            foreach($q1->result_array()[$i] as $key => $value) {
+                array_push($col_arr, $value);
+            }
+            $implode = json_encode($col_arr);
+            /*array_push($col_arr, "
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#editModal' onclick='editAccPayable(".$implode.")'>Edit</a>
+                <a class='btn btn-default' role='button' onclick='deleteAccPayable(".$implode.")'>Delete</a>
+                <a class='btn btn-default' role='button' data-toggle='modal' data-target='#processModal' onclick='proceedAccPayable(".$implode.")'>Process</a>
+            ");*/
             
             array_push($result_arr, $col_arr);
             unset($col_arr);

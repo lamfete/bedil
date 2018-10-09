@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     hideNotification();
 
-    $('#btnProceedAccPayable').prop('disabled', true);
+    // $('#btnProceedAccPayable').prop('disabled', true);
 
     // autoNumeric init
     $('#txtItemPrice').autoNumeric('init');

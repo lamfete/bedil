@@ -29,7 +29,9 @@ class Userexec extends CI_Controller {
             $data['parameter']['length'] = $_POST['length'];
             $data['parameter']['search'] = $_POST['search']['value'];
             $data['parameter']['draw'] = $_POST['draw'];
-
+            $data['parameter']['col'] = $_POST['order'][0]['column'];
+            $data['parameter']['dir'] = $_POST['order'][0]['dir'];
+            
             if(empty($_POST['search']['value'])) {
                 $data['all_user'] = $this->m_user->get_all_user("all", $data['parameter']);  
                 $data['all_user']->draw = $_POST['draw'];
@@ -40,7 +42,7 @@ class Userexec extends CI_Controller {
             }
             // var_dump($data['all_user']);exit;
             // echo json_encode($data['all_user']);
-
+            
             $this->output
             ->set_status_header(200)
             ->set_content_type('application/json', 'utf-8')
