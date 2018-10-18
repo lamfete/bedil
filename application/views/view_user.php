@@ -85,7 +85,15 @@
                     </div>
                     <div class="form-group">
                         <label for="emailEdit">Email</label>
-                        <input type="text" class="form-control" id="txtEmailEdit" placeholder="Email" onfocusout="cekFormEdiUser('email')">
+                        <input type="text" class="form-control" id="txtEmailEdit" placeholder="Email" onfocusout="cekFormEditUser('email')">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPasswordEdit">New Password</label>
+                        <input type="password" class="form-control" id="txtNewPasswordEdit" placeholder="New Password" onfocusout="cekFormEditUser('email')">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmNewPasswordEdit">Confirm New Password</label>
+                        <input type="password" class="form-control" id="txtConfirmNewPasswordEdit" placeholder="Confirm New Password" onfocusout="cekFormEditUser('email')">
                     </div>
                     <div class="checkbox">
                         <label>

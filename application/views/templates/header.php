@@ -137,6 +137,26 @@
                     </li>
 
                     <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Stock<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                        <li><a href="/adjustment/manage">Adjustment</a></li>
+                        <li><a href="/stockopname/manage">Stock Opname</a></li>
+                        <li role="separator" class="divider"></li>
+                        <?php
+                            if($userlevel->user_level_id == 1) {
+                        ?>
+                        <li class="dropdown-header">List of</li>
+                        <li><a href="/sales/view">Sales History</a></li>
+                        <li><a href="/purchase/view">Purchase History</a></li>
+                        <li role="separator" class="divider"></li>
+                        <?php
+                            }
+                        ?>
+                        <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Report<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                         <li><a href="/report/laststock">Last Stock</a></li>

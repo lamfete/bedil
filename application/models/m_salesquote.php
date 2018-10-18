@@ -262,7 +262,7 @@ class M_salesquote extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update sale quote";
+            $result->message = "Successfully update sales quote";
             return $result;
         }
     }
@@ -338,7 +338,7 @@ class M_salesquote extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully proceed sale quote";
+            $result->message = "Successfully proceed sales quote";
             return $result;
         }
     }

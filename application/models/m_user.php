@@ -42,6 +42,7 @@ class M_user extends CI_Model {
                 from user u
                 left join user_level ul
                 on u.user_level_id = ul.user_level_id
+                where u.status = 'AKTIF'
                 order by ".$order." ".$input['dir']."
                 limit ".$input['start'].", ".$input['length'].";
             ";
@@ -51,7 +52,7 @@ class M_user extends CI_Model {
              * 
              */
             $sql2 = "
-                select * from user;
+                select * from user where status = 'AKTIF';
             ";
 
             $q1 = $this->db->query($sql1);
@@ -68,6 +69,7 @@ class M_user extends CI_Model {
                 left join user_level ul
                 on u.user_level_id = ul.user_level_id
                 where u.user_login like '%".$input['search']."%'
+                and u.status = 'AKTIF'
                 order by ".$order." ".$input['dir']."
                 limit ".$input['start'].", ".$input['length'].";
             ";

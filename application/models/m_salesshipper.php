@@ -262,7 +262,7 @@ class M_salesshipper extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update sale shipper";
+            $result->message = "Successfully update sales shipper";
             return $result;
         }
     }
@@ -338,7 +338,7 @@ class M_salesshipper extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully proceed sale shipper";
+            $result->message = "Successfully proceed sales shipper";
             return $result;
         }
     }

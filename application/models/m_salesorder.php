@@ -262,7 +262,7 @@ class M_salesorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully update sale order";
+            $result->message = "Successfully update sales order";
             return $result;
         }
     }
@@ -338,7 +338,7 @@ class M_salesorder extends CI_Model {
         }
         else {
             $this->db->trans_commit();
-            $result->message = "Successfully proceed sale order";
+            $result->message = "Successfully proceed sales order";
             return $result;
         }
     }
