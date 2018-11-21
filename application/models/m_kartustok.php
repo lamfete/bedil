@@ -7,111 +7,185 @@ class M_kartustok extends CI_Model {
         parent::__construct();
     }
 
-    public function insert_beli_kartu_stok($param) {
+    // 20181121
+    public function delete_kartu_stok($param) {
+        $result = new \stdClass();
+        if(count($param) > 0) {
+            $this->db->trans_start();
+            
+            // get latest kartu_stok_id
+            $sql1 = "
+                SELECT tanggal_transaksi
+                FROM kartu_stok
+                WHERE kartu_stok_id = '" . $param['kartuStokId'] . "'
+            ";
+            // echo $sql1 . "<br />";
+
+            $q1 = $this->db->query($sql1);
+            $r1 = $q1->result_array($q1);
+            // var_dump($r1[0]['tanggal_transaksi']);
+
+            $sql2 = "
+                SELECT kartu_stok_id 
+                FROM kartu_stok
+                WHERE tanggal_transaksi > '" . $r1[0]['tanggal_transaksi'] . "'
+                ORDER BY tanggal_transaksi DESC, kartu_stok_id DESC
+                LIMIT 0, 1
+            ";
+            // echo $sql2 . "<br />";
+
+            $q2 = $this->db->query($sql2);
+            $r2 = $q2->result_array($q2);
+            
+            // var_dump($r2[0]['kartu_stok_id']);
+            $this->db->where('kartu_stok_id', $param['kartuStokId']);
+            $this->db->delete('kartu_stok');
+
+            // jalankan procedure update barang kartu stok
+            $this->update_barang_kartu_stok($r2[0]['kartu_stok_id']);
+
+            /*$log = array(
+                'tindakan' => $_SESSION['username'] . " DELETE RECORD KARTU STOK " . $r2[0]['kartu_stok_id'],
+                'created_at' => date("Y-m-d H:i:s"),
+                'created_by' => $param['createdBy']
+            );
+            $q4 = $this->db->insert('user_log', $log);*/
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                $result->message = "Something went wrong";
+                // $result->error = $this->db->error();
+                $result->error = $this->db->_error_message();
+                return $result;
+            }
+            else {
+                $this->db->trans_commit();
+                $result->message = "Successfully delete from kartu stok";
+                return $result;
+            }
+
+        }
+    }
+
+    // 20181029
+    public function insert_kartu_stok($param) {
         $result = new \stdClass();
         // var_dump($param);
         if(count($param) > 0) {
             // var_dump($param[0]['itemLineId']);
+
+            if($param['tipe_transaksi'] == 'SJ') {
+                $tipe_transaksi = 'SJ';
+                $adj_type = NULL; // BELOM DI TES
+                $param['beli_jumlah'] = 0;
+                $param['beli_harga'] = 0;
+                $param['beli_total'] = 0;
+                $param['jual_retur_jumlah'] = 0;
+                $param['jual_retur_harga'] = 0;
+                $param['jual_retur_total'] = 0;
+                $param['beli_retur_jumlah'] = 0;
+                $param['beli_retur_harga'] = 0;
+                $param['beli_retur_total'] = 0;
+                $param['adj_jumlah'] = 0;
+                $param['adj_harga'] = 0;
+                $param['adj_total'] = 0;
+                $adj_type = 'NULL';
+                $s_akhir_harga = $param['jual_harga'];
+                $s_akhir_total = ($param['s_awal_jumlah'] - $param['jual_jumlah']) * $param['jual_harga'];
+            } elseif($param['tipe_transaksi'] == 'MRR') {
+                $tipe_transaksi = 'MRR';
+                $adj_type = NULL; // BELOM DI TES
+                $param['jual_jumlah'] = 0;
+                $param['jual_harga'] = 0;
+                $param['jual_total'] = 0;
+                $param['jual_retur_jumlah'] = 0;
+                $param['jual_retur_harga'] = 0;
+                $param['jual_retur_total'] = 0;
+                $param['beli_retur_jumlah'] = 0;
+                $param['beli_retur_harga'] = 0;
+                $param['beli_retur_total'] = 0;
+                $param['adj_jumlah'] = 0;
+                $param['adj_harga'] = 0;
+                $param['adj_total'] = 0;
+                $adj_type = 'NULL';
+                $s_akhir_harga = $param['beli_harga'];
+                $s_akhir_total = ($param['s_awal_jumlah'] + $param['beli_jumlah']) * $param['beli_harga'];
+            } elseif($param['tipe_transaksi'] == 'ADJ') {
+                if($param['adj_type'] == 'IN') {
+                    $tipe_transaksi = 'ADJ';
+                    $adj_type = 'IN';
+                    $param['beli_jumlah'] = 0;
+                    $param['beli_harga'] = 0;
+                    $param['beli_total'] = 0;
+                    $param['jual_jumlah'] = 0;
+                    $param['jual_harga'] = 0;
+                    $param['jual_total'] = 0;
+                    $param['jual_retur_jumlah'] = 0;
+                    $param['jual_retur_harga'] = 0;
+                    $param['jual_retur_total'] = 0;
+                    $param['beli_retur_jumlah'] = 0;
+                    $param['beli_retur_harga'] = 0;
+                    $param['beli_retur_total'] = 0;
+                    $param['adj_total'] = $param['adj_jumlah'] * $param['adj_harga'];
+                } elseif($param['adj_type'] == 'OUT') {
+                    $tipe_transaksi = 'ADJ';
+                    $adj_type = 'OUT';
+                    $param['beli_jumlah'] = 0;
+                    $param['beli_harga'] = 0;
+                    $param['beli_total'] = 0;
+                    $param['jual_jumlah'] = 0;
+                    $param['jual_harga'] = 0;
+                    $param['jual_total'] = 0;
+                    $param['jual_retur_jumlah'] = 0;
+                    $param['jual_retur_harga'] = 0;
+                    $param['jual_retur_total'] = 0;
+                    $param['beli_retur_jumlah'] = 0;
+                    $param['beli_retur_harga'] = 0;
+                    $param['beli_retur_total'] = 0;
+                    $param['adj_total'] = $param['adj_jumlah'] * $param['adj_harga'];
+                }
+            } elseif($param['tipe_transaksi'] == 'RJ') {
+
+            } elseif($param['tipe_transaksi'] == 'RB') {
+                
+            }
             
             // insert into kartu_stok
             $kartu_stok = array(
                 'tanggal_transaksi' => $param['tanggal_transaksi'],
                 'item_id' => $param['item_id'],
-                's_awal_jumlah' => $param['s_awal_jumlah'],
-                's_awal_harga' => $param['s_awal_harga'],
-                's_awal_total' => $param['s_awal_total'],
+                's_awal_jumlah' => 0,
+                's_awal_harga' => 0,
+                's_awal_total' => 0,
                 'beli_jumlah' => $param['beli_jumlah'],
                 'beli_harga' => $param['beli_harga'],
                 'beli_total' => $param['beli_total'],
-                's_akhir_jumlah' => $param['s_awal_jumlah'] + $param['beli_jumlah'],
-                's_akhir_harga' => $param['beli_harga'],
-                's_akhir_total' => ($param['s_awal_jumlah'] + $param['beli_jumlah']) * $param['beli_harga'],
-                'keterangan' => $param['keterangan'],
-                'tipe_transaksi' => 'MRR',
-                'created_at' => $param['created_at'],
-                'created_by' => $param['created_by']
-            );
-
-            $this->db->trans_start();
-            $q1 = $this->db->insert('kartu_stok', $kartu_stok);
-
-            // get latest kartu_stok_id
-            $sql2 = "
-                SELECT kartu_stok_id
-                FROM kartu_stok
-                ORDER BY kartu_stok_id DESC
-                LIMIT 0, 1;
-            ";
-
-            $q2 = $this->db->query($sql2);
-            $r2 = $q2->result_array($q2);
-
-            // jalankan procedure update barang kartu stok
-            $this->update_barang_kartu_stok($r2[0]['kartu_stok_id']);
-
-            /*$this->db->select('sales_quote_date');
-            $this->db->from('sales_quote_head');
-            $this->db->order_by('sales_quote_date', 'DESC');
-            $this->db->limit(0, 1);
-
-            $sales_quote_no = $this->db->get();*/
-            // print_r($sales_quote_no->result_array());
-            // var_dump($sales_quote_no[0]['sales_quote_no']);
-
-            $log = array(
-                'tindakan' => $_SESSION['username'] . " CREATE NEW RECORD KARTU STOK",
-                'created_at' => date("Y-m-d H:i:s"),
-                'created_by' => $param['created_by']
-            );
-            $q4 = $this->db->insert('user_log', $log);
-            $this->db->trans_complete();
-
-            if ($this->db->trans_status() === FALSE) {
-                $this->db->trans_rollback();
-                $result->message = "Something went wrong";
-                // $result->error = $this->db->error();
-                $result->error = $this->db->_error_message();
-                return $result;
-            }
-            else {
-                $this->db->trans_commit();
-                $result->message = "Successfully create new sales quote";
-                return $result;
-            }
-        }
-        else {
-            $result->message = "no sales quote data.";
-        }   
-    }
-
-    public function insert_jual_kartu_stok($param) {
-        $result = new \stdClass();
-        // var_dump($param);
-        if(count($param) > 0) {
-            // var_dump($param[0]['itemLineId']);
-            
-            // insert into kartu_stok
-            $kartu_stok = array(
-                'tanggal_transaksi' => $param['tanggal_transaksi'],
-                'item_id' => $param['item_id'],
-                's_awal_jumlah' => $param['s_awal_jumlah'],
-                's_awal_harga' => $param['s_awal_harga'],
-                's_awal_total' => $param['s_awal_total'],
                 'jual_jumlah' => $param['jual_jumlah'],
                 'jual_harga' => $param['jual_harga'],
                 'jual_total' => $param['jual_total'],
-                's_akhir_jumlah' => $param['s_awal_jumlah'] - $param['jual_jumlah'],
-                's_akhir_harga' => $param['jual_harga'],
-                's_akhir_total' => ($param['s_awal_jumlah'] - $param['jual_jumlah']) * $param['jual_harga'],
+                'jual_retur_jumlah' => $param['jual_retur_jumlah'],
+                'jual_retur_harga' => $param['jual_retur_harga'],
+                'jual_retur_total' => $param['jual_retur_total'],
+                'beli_retur_jumlah' => $param['beli_retur_jumlah'],
+                'beli_retur_harga' => $param['beli_retur_harga'],
+                'beli_retur_total' => $param['beli_retur_total'],
+                'adj_jumlah' => $param['adj_jumlah'],
+                'adj_harga' => $param['adj_harga'],
+                'adj_total' => $param['adj_total'],
+                's_akhir_jumlah' => 0,//$param['s_awal_jumlah'] + $param['beli_jumlah'] - $param['jual_jumlah'],
+                's_akhir_harga' => 0,//$s_akhir_harga,
+                's_akhir_total' => 0,//$s_akhir_total,
                 'keterangan' => $param['keterangan'],
-                'tipe_transaksi' => 'SJ',
+                'tipe_transaksi' => $tipe_transaksi,
+                'adj_type' => $adj_type,
                 'created_at' => $param['created_at'],
                 'created_by' => $param['created_by']
             );
-
+            // var_dump($kartu_stok);
             $this->db->trans_start();
             $q1 = $this->db->insert('kartu_stok', $kartu_stok);
-
+            
             // get latest kartu_stok_id
             $sql2 = "
                 SELECT kartu_stok_id
@@ -136,7 +210,7 @@ class M_kartustok extends CI_Model {
             // var_dump($sales_quote_no[0]['sales_quote_no']);
 
             $log = array(
-                'tindakan' => $_SESSION['username'] . " CREATE NEW RECORD KARTU STOK",
+                'tindakan' => $_SESSION['username'] . " CREATE NEW RECORD KARTU STOK " . $r2[0]['kartu_stok_id'],
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_by' => $param['created_by']
             );
@@ -152,12 +226,12 @@ class M_kartustok extends CI_Model {
             }
             else {
                 $this->db->trans_commit();
-                $result->message = "Successfully create new sales quote";
+                $result->message = "Successfully insert into kartu stok";
                 return $result;
             }
         }
         else {
-            $result->message = "no sales quote data.";
+            $result->message = "no kartu stok data.";
         }   
     }
 
@@ -184,7 +258,7 @@ class M_kartustok extends CI_Model {
             ";
 
             $q1 = $this->db->query($sql1);
-            /*var_dump($q1->result_array($q1);*/
+            // var_dump($q1->result_array($q1));
             // echo "<br />" . $sql1;
             // echo "<br />---------------------<br />";
             $r1 = $q1->result_array($q1);
@@ -232,7 +306,7 @@ class M_kartustok extends CI_Model {
             
             $q2 = $this->db->query($sql2);
             $r2 = $q2->result_array($q2);
-            /*var_dump($r2);*/
+            // var_dump($r2);
             // echo "<br />" . $sql2;
             // echo "<br />---------------------<br />";
 
@@ -257,9 +331,23 @@ class M_kartustok extends CI_Model {
                 $sa_harga = 0;
                 $sa_total = 0;
             }
+
+            #JIKA SALDO_AKHIR NULL, DIISI DENGAN SALDO_AWAL YANG DIINPUTKAN
+            if ($sa_jumlah == NULL) { $sa_jumlah = $sa_jumlah_t; }
+            if ($sa_harga == '') { $sa_harga = $sa_harga_t; }
+            if ($sa_jumlah == '') { $sa_jumlah = $sa_jumlah_t; }
+            if ($jual_jum == '') { $jual_jum = 0; }
+            if ($jual_hrg == '') { $jual_hrg = 0; }
+            if ($jual_tot == '') { $jual_tot = 0; }
+            if ($beli_jum == '') { $beli_jum = 0; }
+            if ($beli_hrg == '') { $beli_hrg = 0; }
+            if ($beli_tot == '') { $beli_tot = 0; }
+
+            if ($beli_hrg == 0 && $beli_jum <> 0) { $beli_hrg = $sa_harga; }
             
             $jual_tot = $jual_jum * $jual_hrg;
             $beli_tot = $beli_jum * $beli_hrg;
+            $sa_total = $sa_jumlah * $sa_harga;
 
             if($tipe_transaksi == 'SJ' OR $tipe_transaksi == 'MRR') { 
                 $sk_jumlah = $sa_jumlah - $jual_jum + $beli_jum; 
@@ -271,8 +359,8 @@ class M_kartustok extends CI_Model {
                 }
                 $sk_total = $sk_jumlah * $sk_harga;
             }
-            if($tipe_transaksi == 'ADJ' AND $adj_type == 'IN') { $sk_jumlah = $sa_jumlah + $adj_jum; }
-            if($tipe_transaksi == 'ADJ' AND $adj_type == 'OUT') { $sk_jumlah = $sa_jumlah - $adj_jum; }
+            if($tipe_transaksi == 'ADJ' AND $adj_type == 'IN') { $sk_jumlah = $sa_jumlah + $adj_jum; $sk_harga = $adj_hrg; $sk_total = $sk_jumlah * $sk_harga; }
+            if($tipe_transaksi == 'ADJ' AND $adj_type == 'OUT') { $sk_jumlah = $sa_jumlah - $adj_jum; $sk_harga = $adj_hrg; $sk_total = $sk_jumlah * $sk_harga; }
 
             if ($sk_jumlah != 0) { $sk_harga = $sk_total / $sk_jumlah; }
             else { $sk_harga = 0; }

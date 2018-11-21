@@ -344,11 +344,13 @@ class M_accpayable extends CI_Model {
                 // 'acc_payable_line_status' => 'OPEN',
                 'keterangan' => $param['accPayableLine'][$i]['accPayableLineKet'],
                 'created_at' => date("Y-m-d H:i:s"),
-                'created_by' => $param['updatedBy']
+                'created_by' => $param['updatedBy'],
+                'tipe_transaksi' => 'MRR' // 20181029
             );
         
             // $this->db->insert('kartu_stok', $data);
-            $this->m_kartustok->insert_beli_kartu_stok($data);
+            // $this->m_kartustok->insert_beli_kartu_stok($data);
+            $this->m_kartustok->insert_kartu_stok($data);
         }
         // end of kartu stok
 
